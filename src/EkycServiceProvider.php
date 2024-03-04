@@ -2,9 +2,9 @@
 
 namespace Fintech\Ekyc;
 
-use Illuminate\Support\ServiceProvider;
-use Fintech\Ekyc\Commands\InstallCommand;
 use Fintech\Ekyc\Commands\EkycCommand;
+use Fintech\Ekyc\Commands\InstallCommand;
+use Illuminate\Support\ServiceProvider;
 
 class EkycServiceProvider extends ServiceProvider
 {

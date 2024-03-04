@@ -2,9 +2,9 @@
 
 namespace Fintech\Ekyc\Tests;
 
+use Fintech\Ekyc\EkycServiceProvider;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Fintech\Ekyc\EkycServiceProvider;
 
 class TestCase extends Orchestra
 {
