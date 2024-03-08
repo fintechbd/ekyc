@@ -24,6 +24,12 @@ return [
 
     'root_prefix' => 'test/',
 
+    'providers' => [
+        'shufti_pro' => [
+            
+        ]
+    ],
+
     //** Model Config Point Do not Remove **//
 
     /*
