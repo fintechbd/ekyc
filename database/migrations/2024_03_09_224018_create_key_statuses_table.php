@@ -20,6 +20,7 @@ return new class extends Migration
             $table->json('request')->nullable();
             $table->string('status')->nullable();
             $table->json('response')->nullable();
+            $table->text('note')->nullable();
             $table->json('key_status_data')->nullable();
             $table->foreignId('creator_id')->nullable();
             $table->foreignId('editor_id')->nullable();
