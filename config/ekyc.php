@@ -13,6 +13,14 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | KYC Vendor
+    |--------------------------------------------------------------------------
+    | When KYC is initialed which vendor will be used to proceed.
+    */
+    'default' => 'manual',
+
+    /*
+    |--------------------------------------------------------------------------
     | Ekyc Group Root Prefix
     |--------------------------------------------------------------------------
     |
@@ -25,10 +33,45 @@ return [
     'root_prefix' => 'test/',
 
     'providers' => [
+        'manual' => [
+            'mode' => 'live',
+            'driver' => Fintech\Ekyc\Vendors\AdminVerify::class,
+            'live' => [
+                'endpoint' => 'https://api.shuftipro.com',
+                'username' => '7106UAT',
+                'password' => '7106@Pass',
+            ],
+            'sandbox' => [
+                'endpoint' => 'https://api.shuftipro.com',
+                'username' => '7086UAT',
+                'password' => '7086@Pass'
+            ],
+        ],
         'shufti_pro' => [
-
+            'mode' => 'sandbox',
+            'driver' => Fintech\Ekyc\Vendors\ShuftiPro::class,
+            'live' => [
+                'endpoint' => 'https://api.shuftipro.com',
+                'username' => '7106UAT',
+                'password' => '7106@Pass',
+            ],
+            'sandbox' => [
+                'endpoint' => 'https://api.shuftipro.com',
+                'username' => '7086UAT',
+                'password' => '7086@Pass'
+            ],
         ],
     ],
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | KycStatus Model
+    |--------------------------------------------------------------------------
+    |
+    | This value will be used to across system where model is needed
+    */
+    'kyc_status_model' => \Fintech\Ekyc\Models\KycStatus::class,
 
     //** Model Config Point Do not Remove **//
 
@@ -41,6 +84,8 @@ return [
     */
 
     'repositories' => [
+        \Fintech\Ekyc\Interfaces\KycStatusRepository::class => \Fintech\Ekyc\Repositories\Eloquent\KycStatusRepository::class,
+
         //** Repository Binding Config Point Do not Remove **//
     ],
 

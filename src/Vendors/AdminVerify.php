@@ -5,7 +5,7 @@ namespace Fintech\Ekyc\Vendors;
 use Fintech\Ekyc\Interfaces\KycVendor;
 use Illuminate\Support\Facades\Http;
 
-class ShuftiPro implements KycVendor
+class AdminVerify implements KycVendor
 {
     public $config;
 
