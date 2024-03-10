@@ -52,13 +52,13 @@ return [
             'driver' => Fintech\Ekyc\Vendors\ShuftiPro::class,
             'live' => [
                 'endpoint' => 'https://api.shuftipro.com',
-                'username' => '7106UAT',
-                'password' => '7106@Pass',
+                'username' => env('PACKAGE_EKYC_SHUFTIPRO_ID', null),
+                'password' => env('PACKAGE_EKYC_SHUFTIPRO_SECRET', null),
             ],
             'sandbox' => [
                 'endpoint' => 'https://api.shuftipro.com',
-                'username' => '7086UAT',
-                'password' => '7086@Pass',
+                'username' => env('PACKAGE_EKYC_SHUFTIPRO_ID', null),
+                'password' => env('PACKAGE_EKYC_SHUFTIPRO_SECRET', null),
             ],
         ],
     ],
