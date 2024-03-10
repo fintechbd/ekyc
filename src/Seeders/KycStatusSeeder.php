@@ -2,8 +2,8 @@
 
 namespace Fintech\Ekyc\Seeders;
 
-use Illuminate\Database\Seeder;
 use Fintech\Ekyc\Facades\Ekyc;
+use Illuminate\Database\Seeder;
 
 class KycStatusSeeder extends Seeder
 {
@@ -24,6 +24,6 @@ class KycStatusSeeder extends Seeder
 
     private function data()
     {
-        return array();
+        return [];
     }
 }

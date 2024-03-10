@@ -21,7 +21,6 @@ class AdminVerify implements KycVendor
             'password' => '',
         ]);
 
-
     }
 
     private function call($data = [])

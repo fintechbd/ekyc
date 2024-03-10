@@ -2,26 +2,22 @@
 
 namespace Fintech\Ekyc\Services;
 
-
 use Fintech\Ekyc\Interfaces\KycStatusRepository;
 
 /**
  * Class KycStatusService
- * @package Fintech\Ekyc\Services
- *
  */
 class KycStatusService
 {
     /**
      * KycStatusService constructor.
-     * @param KycStatusRepository $kycStatusRepository
      */
-    public function __construct(KycStatusRepository $kycStatusRepository) {
+    public function __construct(KycStatusRepository $kycStatusRepository)
+    {
         $this->kycStatusRepository = $kycStatusRepository;
     }
 
     /**
-     * @param array $filters
      * @return mixed
      */
     public function list(array $filters = [])

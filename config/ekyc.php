@@ -44,7 +44,7 @@ return [
             'sandbox' => [
                 'endpoint' => 'https://api.shuftipro.com',
                 'username' => '7086UAT',
-                'password' => '7086@Pass'
+                'password' => '7086@Pass',
             ],
         ],
         'shufti_pro' => [
@@ -58,11 +58,10 @@ return [
             'sandbox' => [
                 'endpoint' => 'https://api.shuftipro.com',
                 'username' => '7086UAT',
-                'password' => '7086@Pass'
+                'password' => '7086@Pass',
             ],
         ],
     ],
-
 
     /*
     |--------------------------------------------------------------------------

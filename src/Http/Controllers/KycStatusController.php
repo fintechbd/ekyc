@@ -1,34 +1,33 @@
 <?php
 
 namespace Fintech\Ekyc\Http\Controllers;
+
 use Exception;
-use Fintech\Core\Exceptions\StoreOperationException;
-use Fintech\Core\Exceptions\UpdateOperationException;
 use Fintech\Core\Exceptions\DeleteOperationException;
 use Fintech\Core\Exceptions\RestoreOperationException;
+use Fintech\Core\Exceptions\StoreOperationException;
+use Fintech\Core\Exceptions\UpdateOperationException;
 use Fintech\Core\Traits\ApiResponseTrait;
 use Fintech\Ekyc\Facades\Ekyc;
-use Fintech\Ekyc\Http\Resources\KycStatusResource;
-use Fintech\Ekyc\Http\Resources\KycStatusCollection;
 use Fintech\Ekyc\Http\Requests\ImportKycStatusRequest;
+use Fintech\Ekyc\Http\Requests\IndexKycStatusRequest;
 use Fintech\Ekyc\Http\Requests\StoreKycStatusRequest;
 use Fintech\Ekyc\Http\Requests\UpdateKycStatusRequest;
-use Fintech\Ekyc\Http\Requests\IndexKycStatusRequest;
+use Fintech\Ekyc\Http\Resources\KycStatusCollection;
+use Fintech\Ekyc\Http\Resources\KycStatusResource;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 
 /**
  * Class KycStatusController
- * @package Fintech\Ekyc\Http\Controllers
  *
  * @lrd:start
  * This class handle create, display, update, delete & restore
  * operation related to KycStatus
- * @lrd:end
  *
+ * @lrd:end
  */
-
 class KycStatusController extends Controller
 {
     use ApiResponseTrait;
@@ -38,10 +37,8 @@ class KycStatusController extends Controller
      * Return a listing of the *KycStatus* resource as collection.
      *
      * *```paginate=false``` returns all resource as list not pagination*
-     * @lrd:end
      *
-     * @param IndexKycStatusRequest $request
-     * @return KycStatusCollection|JsonResponse
+     * @lrd:end
      */
     public function index(IndexKycStatusRequest $request): KycStatusCollection|JsonResponse
     {
@@ -61,10 +58,9 @@ class KycStatusController extends Controller
     /**
      * @lrd:start
      * Create a new *KycStatus* resource in storage.
+     *
      * @lrd:end
      *
-     * @param StoreKycStatusRequest $request
-     * @return JsonResponse
      * @throws StoreOperationException
      */
     public function store(StoreKycStatusRequest $request): JsonResponse
@@ -74,14 +70,14 @@ class KycStatusController extends Controller
 
             $kycStatus = Ekyc::kycStatus()->create($inputs);
 
-            if (!$kycStatus) {
+            if (! $kycStatus) {
                 throw (new StoreOperationException)->setModel(config('fintech.ekyc.kyc_status_model'));
             }
 
             return $this->created([
                 'message' => __('core::messages.resource.created', ['model' => 'Kyc Status']),
-                'id' => $kycStatus->id
-             ]);
+                'id' => $kycStatus->id,
+            ]);
 
         } catch (Exception $exception) {
 
@@ -92,10 +88,9 @@ class KycStatusController extends Controller
     /**
      * @lrd:start
      * Return a specified *KycStatus* resource found by id.
+     *
      * @lrd:end
      *
-     * @param string|int $id
-     * @return KycStatusResource|JsonResponse
      * @throws ModelNotFoundException
      */
     public function show(string|int $id): KycStatusResource|JsonResponse
@@ -104,7 +99,7 @@ class KycStatusController extends Controller
 
             $kycStatus = Ekyc::kycStatus()->find($id);
 
-            if (!$kycStatus) {
+            if (! $kycStatus) {
                 throw (new ModelNotFoundException)->setModel(config('fintech.ekyc.kyc_status_model'), $id);
             }
 
@@ -123,11 +118,9 @@ class KycStatusController extends Controller
     /**
      * @lrd:start
      * Update a specified *KycStatus* resource using id.
+     *
      * @lrd:end
      *
-     * @param UpdateKycStatusRequest $request
-     * @param string|int $id
-     * @return JsonResponse
      * @throws ModelNotFoundException
      * @throws UpdateOperationException
      */
@@ -137,13 +130,13 @@ class KycStatusController extends Controller
 
             $kycStatus = Ekyc::kycStatus()->find($id);
 
-            if (!$kycStatus) {
+            if (! $kycStatus) {
                 throw (new ModelNotFoundException)->setModel(config('fintech.ekyc.kyc_status_model'), $id);
             }
 
             $inputs = $request->validated();
 
-            if (!Ekyc::kycStatus()->update($id, $inputs)) {
+            if (! Ekyc::kycStatus()->update($id, $inputs)) {
 
                 throw (new UpdateOperationException)->setModel(config('fintech.ekyc.kyc_status_model'), $id);
             }
@@ -163,10 +156,11 @@ class KycStatusController extends Controller
     /**
      * @lrd:start
      * Soft delete a specified *KycStatus* resource using id.
+     *
      * @lrd:end
      *
-     * @param string|int $id
      * @return JsonResponse
+     *
      * @throws ModelNotFoundException
      * @throws DeleteOperationException
      */
@@ -176,11 +170,11 @@ class KycStatusController extends Controller
 
             $kycStatus = Ekyc::kycStatus()->find($id);
 
-            if (!$kycStatus) {
+            if (! $kycStatus) {
                 throw (new ModelNotFoundException)->setModel(config('fintech.ekyc.kyc_status_model'), $id);
             }
 
-            if (!Ekyc::kycStatus()->destroy($id)) {
+            if (! Ekyc::kycStatus()->destroy($id)) {
 
                 throw (new DeleteOperationException())->setModel(config('fintech.ekyc.kyc_status_model'), $id);
             }
@@ -201,9 +195,9 @@ class KycStatusController extends Controller
      * @lrd:start
      * Restore the specified *KycStatus* resource from trash.
      * ** ```Soft Delete``` needs to enabled to use this feature**
+     *
      * @lrd:end
      *
-     * @param string|int $id
      * @return JsonResponse
      */
     public function restore(string|int $id)
@@ -212,11 +206,11 @@ class KycStatusController extends Controller
 
             $kycStatus = Ekyc::kycStatus()->find($id, true);
 
-            if (!$kycStatus) {
+            if (! $kycStatus) {
                 throw (new ModelNotFoundException)->setModel(config('fintech.ekyc.kyc_status_model'), $id);
             }
 
-            if (!Ekyc::kycStatus()->restore($id)) {
+            if (! Ekyc::kycStatus()->restore($id)) {
 
                 throw (new RestoreOperationException())->setModel(config('fintech.ekyc.kyc_status_model'), $id);
             }
@@ -239,9 +233,6 @@ class KycStatusController extends Controller
      * After export job is done system will fire  export completed event
      *
      * @lrd:end
-     *
-     * @param IndexKycStatusRequest $request
-     * @return JsonResponse
      */
     public function export(IndexKycStatusRequest $request): JsonResponse
     {
@@ -265,7 +256,6 @@ class KycStatusController extends Controller
      *
      * @lrd:end
      *
-     * @param ImportKycStatusRequest $request
      * @return KycStatusCollection|JsonResponse
      */
     public function import(ImportKycStatusRequest $request): JsonResponse

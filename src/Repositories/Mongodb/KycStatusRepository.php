@@ -6,18 +6,15 @@ use Fintech\Core\Repositories\MongodbRepository;
 use Fintech\Ekyc\Interfaces\KycStatusRepository as InterfacesKycStatusRepository;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Collection;
-use MongoDB\Laravel\Eloquent\Model;
-use InvalidArgumentException;
 
 /**
  * Class KycStatusRepository
- * @package Fintech\Ekyc\Repositories\Mongodb
  */
 class KycStatusRepository extends MongodbRepository implements InterfacesKycStatusRepository
 {
     public function __construct()
     {
-       parent::__construct(config('fintech.ekyc.kyc_status_model', \Fintech\Ekyc\Models\KycStatus::class));
+        parent::__construct(config('fintech.ekyc.kyc_status_model', \Fintech\Ekyc\Models\KycStatus::class));
     }
 
     /**

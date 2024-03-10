@@ -21,7 +21,6 @@ class ShuftiPro implements KycVendor
             'password' => '',
         ]);
 
-
     }
 
     private function call($data = [])
