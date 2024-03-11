@@ -35,6 +35,25 @@ class ShuftiPro implements KycVendor
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
             ])->post($this->config['endpoint'], $data);
+
+        $responseBody = $this->httpErrorHandler($response);
+    }
+
+    private function httpErrorHandler(\Illuminate\Http\Client\Response $response)
+    {
+        return match ($response->status()) {
+            200 => $response->json(),
+            400 => ['message' => 'Bad Request: one or more parameter is invalid or missing'],
+            401 => ['message' => 'Unauthorized: invalid signature key provided in the request'],
+            402 => ['message' => 'Request Failed: invalid request data: missing required parameters'],
+            403 => ['message' => 'Forbidden: service not allowed'],
+            404 => ['message' => 'Not Found: Resource not found'],
+            409 => ['message' => 'Conflict: Conflicting data: already exists'],
+            429 => ['message' => 'Too Many Attempts.'],
+            500 => ['message' => 'Internal Server Error'],
+            504 => ['message' => 'Server error'],
+            524 => ['message' => 'Timeout from Cloudflare	'],
+        };
     }
 
     public function status(array $reference = [])
