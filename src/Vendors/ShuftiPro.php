@@ -25,8 +25,8 @@ class ShuftiPro implements KycVendor
 
     private function call($data = [])
     {
-        if (!$this->config['username'] || !$this->config['password']) {
-            throw new \InvalidArgumentException("Shufti Pro Client ID & Secret Key is missing.");
+        if (! $this->config['username'] || ! $this->config['password']) {
+            throw new \InvalidArgumentException('Shufti Pro Client ID & Secret Key is missing.');
         }
 
         $response = Http::withoutVerifying()
