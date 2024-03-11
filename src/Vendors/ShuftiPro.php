@@ -56,6 +56,11 @@ class ShuftiPro implements KycVendor
         };
     }
 
+    private function eventStatusHandler(array $response)
+    {
+
+    }
+
     public function status(array $reference = [])
     {
 
