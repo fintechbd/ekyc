@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('key_statuses', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable();
+            $table->string('reference_no')->nullable();
             $table->string('type')->nullable();
             $table->unsignedInteger('attempts')->default(1);
             $table->string('vendor')->default('manual');
