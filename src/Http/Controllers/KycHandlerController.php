@@ -22,8 +22,8 @@ class KycHandlerController extends Controller
     /**
      * @lrd:start
      * this return current enabled kyc vendor login credentials.
+     *
      * @lrd:end
-     * @return JsonResponse
      */
     public function credential(): JsonResponse
     {
