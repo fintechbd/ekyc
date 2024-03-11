@@ -14,11 +14,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 if (Config::get('fintech.ekyc.enabled')) {
-    Route::prefix('ekyc')->name('ekyc.')->group(function () {
-        Route::post('kyc-initialize', \Fintech\Ekyc\Http\Controllers\KycHandlerController::class)->name('kyc-initialize');
-        Route::apiResource('kyc-statuses', \Fintech\Ekyc\Http\Controllers\KycStatusController::class);
-        Route::post('kyc-statuses/{kyc_status}/restore', [\Fintech\Ekyc\Http\Controllers\KycStatusController::class, 'restore'])->name('kyc-statuses.restore');
-
-        //DO NOT REMOVE THIS LINE//
-    });
+    Route::prefix('ekyc')->name('ekyc.')
+        ->middleware(config('fintech.auth.middleware'))
+        ->group(function () {
+            Route::apiResource('kyc-statuses', \Fintech\Ekyc\Http\Controllers\KycStatusController::class);
+            Route::post('kyc-statuses/{kyc_status}/restore', [\Fintech\Ekyc\Http\Controllers\KycStatusController::class, 'restore'])->name('kyc-statuses.restore');
+            //DO NOT REMOVE THIS LINE//
+            Route::withoutMiddleware(config('fintech.auth.middleware'))->group(function () {
+                Route::post('kyc-initialize', \Fintech\Ekyc\Http\Controllers\KycHandlerController::class)->name('kyc-initialize');
+                Route::post('kyc-credential', [\Fintech\Ekyc\Http\Controllers\KycHandlerController::class, 'credential'])->name('kyc-credential');
+            });
+        });
 }
