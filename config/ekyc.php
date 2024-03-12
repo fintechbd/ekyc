@@ -9,7 +9,7 @@ return [
     |--------------------------------------------------------------------------
     | This setting enable the API will be available or not
     */
-    'enabled' => env('PACKAGE_Ekyc_ENABLED', true),
+    'enabled' => env('PACKAGE_EKYC_ENABLED', true),
 
     /*
     |--------------------------------------------------------------------------
