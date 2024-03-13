@@ -3,6 +3,7 @@
 namespace Fintech\Ekyc\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreKycStatusRequest extends FormRequest
 {
@@ -22,7 +23,9 @@ class StoreKycStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'user_id' => ['required', 'integer', 'min:1'],
+            'type' => ['string', 'nullable'],
+            'vendor' => ['string', 'required', Rule::in(array_keys(config('fintech.ekyc.providers')))],
         ];
     }
 
