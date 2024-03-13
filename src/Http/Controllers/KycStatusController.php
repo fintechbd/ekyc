@@ -76,7 +76,7 @@ class KycStatusController extends Controller
 
             return $this->created([
                 'message' => __('core::messages.resource.created', ['model' => 'Kyc Status']),
-                'id' => $kycStatus->id,
+                'id' => $kycStatus->getKey(),
             ]);
 
         } catch (Exception $exception) {

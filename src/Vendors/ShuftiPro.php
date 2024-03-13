@@ -23,7 +23,12 @@ class ShuftiPro implements KycVendor
 
     }
 
-    private function call($data = [])
+    /**
+     * @param string $url
+     * @param array $data
+     * @return void
+     */
+    private function call(string $url = '/', array $data = [])
     {
         if (! $this->config['username'] || ! $this->config['password']) {
             throw new \InvalidArgumentException('Shufti Pro Client ID & Secret Key is missing.');
@@ -31,10 +36,11 @@ class ShuftiPro implements KycVendor
 
         $response = Http::withoutVerifying()
             ->withBasicAuth($this->config['username'], $this->config['password'])
+            ->baseUrl($this->config['endpoint'])
             ->withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
-            ])->post($this->config['endpoint'], $data);
+            ])->post($url, $data);
 
         $responseBody = $this->httpErrorHandler($response);
     }
@@ -61,9 +67,11 @@ class ShuftiPro implements KycVendor
 
     }
 
-    public function status(array $reference = [])
+    public function status(string $reference)
     {
-
+        $this->call('/status', [
+            'reference' => $reference
+        ]);
     }
 
     public function verify(array $data = [])
@@ -71,8 +79,21 @@ class ShuftiPro implements KycVendor
 
     }
 
-    public function delete(array $reference = [])
+    public function address(array $data = [])
     {
 
+    }
+
+    public function document(array $data = [])
+    {
+
+    }
+
+    public function delete(string $reference, array $options = [])
+    {
+        $this->call('/delete', [
+            'reference' => $reference,
+            'comment' => $options['note'] ?? 'Invalid or updated document will be provided later.'
+        ]);
     }
 }

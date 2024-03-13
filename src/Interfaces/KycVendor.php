@@ -10,7 +10,7 @@ interface KycVendor
      *
      * @return mixed
      */
-    public function status(array $reference = []);
+    public function status(string $reference);
 
     /**
      * Make a request with all document to verify on kyc system
@@ -25,5 +25,5 @@ interface KycVendor
      *
      * @return mixed
      */
-    public function delete(array $reference = []);
+    public function delete(string $reference, array $options = []);
 }
