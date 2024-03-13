@@ -24,8 +24,6 @@ class ShuftiPro implements KycVendor
     }
 
     /**
-     * @param string $url
-     * @param array $data
      * @return void
      */
     private function call(string $url = '/', array $data = [])
@@ -70,7 +68,7 @@ class ShuftiPro implements KycVendor
     public function status(string $reference)
     {
         $this->call('/status', [
-            'reference' => $reference
+            'reference' => $reference,
         ]);
     }
 
@@ -93,7 +91,7 @@ class ShuftiPro implements KycVendor
     {
         $this->call('/delete', [
             'reference' => $reference,
-            'comment' => $options['note'] ?? 'Invalid or updated document will be provided later.'
+            'comment' => $options['note'] ?? 'Invalid or updated document will be provided later.',
         ]);
     }
 }
