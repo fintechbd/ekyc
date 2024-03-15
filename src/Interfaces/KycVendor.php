@@ -29,9 +29,6 @@ interface KycVendor
 
     /**
      * load the user that will go to kyc verification
-     *
-     * @param string|int $id
-     * @return self
      */
-    public function user(string|int $id) :self;
+    public function user(string|int $id): self;
 }
