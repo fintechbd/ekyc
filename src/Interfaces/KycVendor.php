@@ -17,7 +17,7 @@ interface KycVendor
      *
      * @return mixed
      */
-    public function verify(array $data = []);
+    public function verify();
 
     /**
      * make a request o kyc partner to erase verification document
@@ -26,4 +26,12 @@ interface KycVendor
      * @return mixed
      */
     public function delete(string $reference, array $options = []);
+
+    /**
+     * load the user that will go to kyc verification
+     *
+     * @param string|int $id
+     * @return self
+     */
+    public function user(string|int $id) :self;
 }

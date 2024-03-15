@@ -2,7 +2,9 @@
 
 namespace Fintech\Ekyc\Vendors;
 
+use Fintech\Core\Facades\Core;
 use Fintech\Ekyc\Interfaces\KycVendor;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Http;
 
 class ShuftiPro implements KycVendor
@@ -10,6 +12,10 @@ class ShuftiPro implements KycVendor
     public $config;
 
     public $mode;
+    private $userModel;
+    private $profileModel;
+    private array $payload;
+    private string $type;
 
     public function __construct()
     {
@@ -21,14 +27,30 @@ class ShuftiPro implements KycVendor
             'password' => null,
         ]);
 
+        $this->payload = [
+            'reference' => '',
+            'country' => '', //id issue county
+            'language' => config('app.locale'),
+            'email' => '',
+            'verification_mode' => 'any',
+            'allow_offline' => '1',
+            'allow_online' => '0',
+            'allow_retry' => '1',
+            'show_consent' => '0',
+            'decline_on_single_step' => '1',
+            'enhanced_originality_checks' => '1',
+            'manual_review' => '0',
+        ];
+
+        $this->userModel = null;
     }
 
     /**
      * @return void
      */
-    private function call(string $url = '/', array $data = [])
+    private function call(string $url = '/')
     {
-        if (! $this->config['username'] || ! $this->config['password']) {
+        if (!$this->config['username'] || !$this->config['password']) {
             throw new \InvalidArgumentException('Shufti Pro Client ID & Secret Key is missing.');
         }
 
@@ -38,7 +60,7 @@ class ShuftiPro implements KycVendor
             ->withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
-            ])->post($url, $data);
+            ])->post($url, $this->payload);
 
         $responseBody = $this->httpErrorHandler($response);
     }
@@ -56,13 +78,42 @@ class ShuftiPro implements KycVendor
             429 => ['message' => 'Too Many Attempts.'],
             500 => ['message' => 'Internal Server Error'],
             504 => ['message' => 'Server error'],
-            524 => ['message' => 'Timeout from Cloudflare	'],
+            524 => ['message' => 'Timeout from Cloudflare'],
         };
     }
 
     private function eventStatusHandler(array $response)
     {
 
+    }
+
+    /**
+     * load the user that will go to kyc verification
+     *
+     * @param string|int $id
+     * @return self
+     */
+    public function user(string|int $id): self
+    {
+        if (!Core::packageExists('Auth')) {
+            throw new \InvalidArgumentException("`Auth` package is missing from the system.");
+        }
+
+        $user = \Fintech\Auth\Facades\Auth::user()->find($id);
+
+        if (!$user) {
+            throw (new ModelNotFoundException())->setModel(config('fintech.auth.user_model', \Fintech\Auth\Models\User::class), $id);
+        }
+
+        $user->load('profile');
+
+        $this->payload['email'] = $user->email ?? '';
+
+        $this->userModel = $user;
+
+        $this->profileModel = $user->profile;
+
+        return $this;
     }
 
     public function status(string $reference)
@@ -72,19 +123,66 @@ class ShuftiPro implements KycVendor
         ]);
     }
 
-    public function verify(array $data = [])
+    public function verify()
     {
 
     }
 
-    public function address(array $data = [])
+    private function userModelConfiguredCheck(): void
     {
+        $class = config('fintech.auth.user_model', \Fintech\Auth\Models\User::class);
 
+        if ($this->userModel == null || $this->userModel instanceof $class) {
+            throw new \InvalidArgumentException("Before setting verification use the `user()` method call.");
+        }
     }
 
-    public function document(array $data = [])
+    public function address(): self
     {
+        $this->userModelConfiguredCheck();
 
+        $this->type = 'address';
+
+
+        return $this;
+    }
+
+    public function identity(): self
+    {
+        $this->userModelConfiguredCheck();
+
+        $this->type = 'identity';
+
+        $document['supported_types'] = [$this->profileModel->id_type ?? 'passport'];
+        $document['backside_proof_required'] = '0';
+        $document['allow_ekyc'] = '0';
+        $document['verification_instructions'] = [
+            'allow_paper_based' => '1',
+            'allow_photocopy' => '1',
+            'allow_laminated' => '1',
+            'allow_screenshot' => '1',
+            'allow_cropped' => '1',
+            'allow_scanned' => '1'
+        ];
+        $document['verification_mode'] = 'any';
+        $document['fetch_enhanced_data'] = '1';
+        $document['name'] = [
+            'full_name' => $this->userModel->name ?? '',
+            'fuzzy_match' => "1"
+        ];
+        $document['dob'] = $this->profileModel->date_of_birth ?? '';
+        $document['issue_date'] = $this->profileModel->id_expired_at ?? '';
+        $document['expiry_date'] = $this->profileModel->id_expired_at ?? '';
+        $document['document_number'] = $this->profileModel->id_no ?? '';
+        $document['gender'] = ($this->profileModel->user_profile_data['gender']) ? substr(strtoupper($this->profileModel->user_profile_data['gender']), 0, 1) : 'M';
+        $document['age'] = [
+            'min' => '18',
+            'max' => '65'
+        ];
+
+        $this->payload['document'] = $document;
+
+        return $this;
     }
 
     public function delete(string $reference, array $options = [])
