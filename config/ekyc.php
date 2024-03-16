@@ -61,6 +61,20 @@ return [
                 'password' => env('PACKAGE_EKYC_SHUFTIPRO_SECRET', null),
             ],
         ],
+        'signzy' => [
+            'mode' => 'sandbox',
+            'driver' => Fintech\Ekyc\Vendors\Signzy::class,
+            'live' => [
+                'endpoint' => 'https://api.shuftipro.com',
+                'username' => env('PACKAGE_EKYC_SHUFTIPRO_ID', null),
+                'password' => env('PACKAGE_EKYC_SHUFTIPRO_SECRET', null),
+            ],
+            'sandbox' => [
+                'endpoint' => 'https://api.shuftipro.com',
+                'username' => env('PACKAGE_EKYC_SHUFTIPRO_ID', null),
+                'password' => env('PACKAGE_EKYC_SHUFTIPRO_SECRET', null),
+            ],
+        ],
     ],
 
     /*

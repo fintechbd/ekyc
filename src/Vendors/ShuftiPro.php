@@ -14,6 +14,7 @@ class ShuftiPro implements KycVendor
     public $mode;
     private $userModel;
     private $profileModel;
+    private $KycStatusModel;
     private array $payload;
     private string $type;
 
@@ -125,7 +126,7 @@ class ShuftiPro implements KycVendor
 
     public function verify()
     {
-
+        $this->call('/');
     }
 
     private function userModelConfiguredCheck(): void

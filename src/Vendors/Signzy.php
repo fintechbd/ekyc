@@ -15,9 +15,9 @@ class Signzy implements KycVendor
 
     public function __construct()
     {
-        $this->mode = config('fintech.ekyc.providers.shufti_pro.mode', 'sandbox');
+        $this->mode = config('fintech.ekyc.providers.signzy.mode', 'sandbox');
 
-        $this->config = config("fintech.ekyc.providers.shufti_pro.{$this->mode}", [
+        $this->config = config("fintech.ekyc.providers.signzy.{$this->mode}", [
             'endpoint' => 'https://api.shuftipro.com',
             'username' => null,
             'password' => null,
