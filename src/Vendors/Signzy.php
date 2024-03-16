@@ -79,15 +79,15 @@ class Signzy implements KycVendor
 
     }
 
-    public function user(string|int $id) :self
+    public function user(string|int $id): self
     {
-        if (!Core::packageExists('Auth')) {
-            throw new \InvalidArgumentException("`Auth` package is missing from the system.");
+        if (! Core::packageExists('Auth')) {
+            throw new \InvalidArgumentException('`Auth` package is missing from the system.');
         }
 
         $user = \Fintech\Auth\Facades\Auth::user()->find($id);
 
-        if (!$user) {
+        if (! $user) {
             throw (new ModelNotFoundException())->setModel(config('fintech.auth.user_model'), $id);
         }
 

@@ -12,10 +12,15 @@ class ShuftiPro implements KycVendor
     public $config;
 
     public $mode;
+
     private $userModel;
+
     private $profileModel;
+
     private $KycStatusModel;
+
     private array $payload;
+
     private string $type;
 
     public function __construct()
@@ -51,7 +56,7 @@ class ShuftiPro implements KycVendor
      */
     private function call(string $url = '/')
     {
-        if (!$this->config['username'] || !$this->config['password']) {
+        if (! $this->config['username'] || ! $this->config['password']) {
             throw new \InvalidArgumentException('Shufti Pro Client ID & Secret Key is missing.');
         }
 
@@ -90,19 +95,16 @@ class ShuftiPro implements KycVendor
 
     /**
      * load the user that will go to kyc verification
-     *
-     * @param string|int $id
-     * @return self
      */
     public function user(string|int $id): self
     {
-        if (!Core::packageExists('Auth')) {
-            throw new \InvalidArgumentException("`Auth` package is missing from the system.");
+        if (! Core::packageExists('Auth')) {
+            throw new \InvalidArgumentException('`Auth` package is missing from the system.');
         }
 
         $user = \Fintech\Auth\Facades\Auth::user()->find($id);
 
-        if (!$user) {
+        if (! $user) {
             throw (new ModelNotFoundException())->setModel(config('fintech.auth.user_model', \Fintech\Auth\Models\User::class), $id);
         }
 
@@ -134,7 +136,7 @@ class ShuftiPro implements KycVendor
         $class = config('fintech.auth.user_model', \Fintech\Auth\Models\User::class);
 
         if ($this->userModel == null || $this->userModel instanceof $class) {
-            throw new \InvalidArgumentException("Before setting verification use the `user()` method call.");
+            throw new \InvalidArgumentException('Before setting verification use the `user()` method call.');
         }
     }
 
@@ -143,7 +145,6 @@ class ShuftiPro implements KycVendor
         $this->userModelConfiguredCheck();
 
         $this->type = 'address';
-
 
         return $this;
     }
@@ -163,13 +164,13 @@ class ShuftiPro implements KycVendor
             'allow_laminated' => '1',
             'allow_screenshot' => '1',
             'allow_cropped' => '1',
-            'allow_scanned' => '1'
+            'allow_scanned' => '1',
         ];
         $document['verification_mode'] = 'any';
         $document['fetch_enhanced_data'] = '1';
         $document['name'] = [
             'full_name' => $this->userModel->name ?? '',
-            'fuzzy_match' => "1"
+            'fuzzy_match' => '1',
         ];
         $document['dob'] = $this->profileModel->date_of_birth ?? '';
         $document['issue_date'] = $this->profileModel->id_expired_at ?? '';
@@ -178,7 +179,7 @@ class ShuftiPro implements KycVendor
         $document['gender'] = ($this->profileModel->user_profile_data['gender']) ? substr(strtoupper($this->profileModel->user_profile_data['gender']), 0, 1) : 'M';
         $document['age'] = [
             'min' => '18',
-            'max' => '65'
+            'max' => '65',
         ];
 
         $this->payload['document'] = $document;
