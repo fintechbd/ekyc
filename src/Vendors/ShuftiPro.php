@@ -58,7 +58,7 @@ class ShuftiPro implements KycVendor
      */
     private function call(string $url = '/')
     {
-        if (!$this->config['username'] || !$this->config['password']) {
+        if (! $this->config['username'] || ! $this->config['password']) {
             throw new \InvalidArgumentException('Shufti Pro Client ID & Secret Key is missing.');
         }
 
@@ -102,13 +102,13 @@ class ShuftiPro implements KycVendor
      */
     public function user(string|int $id): self
     {
-        if (!Core::packageExists('Auth')) {
+        if (! Core::packageExists('Auth')) {
             throw new \InvalidArgumentException('`Auth` package is missing from the system.');
         }
 
         $user = \Fintech\Auth\Facades\Auth::user()->find($id);
 
-        if (!$user) {
+        if (! $user) {
             throw (new ModelNotFoundException())->setModel(config('fintech.auth.user_model', \Fintech\Auth\Models\User::class), $id);
         }
 
@@ -209,8 +209,8 @@ class ShuftiPro implements KycVendor
     {
 
         switch ($this->action) {
-            case KycAction::Verification :
-            {
+            case KycAction::Verification:
+
                 $data = [
                     'user_id' => $this->userModel->getKey(),
                     'reference_no' => null,
@@ -226,7 +226,7 @@ class ShuftiPro implements KycVendor
 
                 Ekyc::kycStatus()->create($data);
                 break;
-            }
+
         }
     }
 }
