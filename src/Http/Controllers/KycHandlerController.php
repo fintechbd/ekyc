@@ -49,7 +49,7 @@ class KycHandlerController extends Controller
     public function vendor(): JsonResponse
     {
 
-        $providers = config("fintech.ekyc.providers");
+        $providers = config('fintech.ekyc.providers');
 
         $vendors = array_keys($providers);
 
@@ -58,10 +58,9 @@ class KycHandlerController extends Controller
         foreach ($vendors as $vendor) {
             $data[] = [
                 'vendor' => $vendor,
-                'countries' => $providers[$vendor]['countries'] ?? []
+                'countries' => $providers[$vendor]['countries'] ?? [],
             ];
         }
-
 
         return $this->success(['data' => $data]);
 

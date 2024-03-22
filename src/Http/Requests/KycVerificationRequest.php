@@ -3,7 +3,6 @@
 namespace Fintech\Ekyc\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rules\Password;
 
 class KycVerificationRequest extends FormRequest
 {
