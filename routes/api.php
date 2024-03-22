@@ -23,7 +23,7 @@ if (Config::get('fintech.ekyc.enabled')) {
             Route::withoutMiddleware(config('fintech.auth.middleware'))->group(function () {
                 Route::post('kyc-verification', \Fintech\Ekyc\Http\Controllers\KycHandlerController::class)->name('kyc-verification');
                 Route::post('kyc-credential', [\Fintech\Ekyc\Http\Controllers\KycHandlerController::class, 'credential'])->name('kyc-credential');
-                Route::post('kyc-vendors', [\Fintech\Ekyc\Http\Controllers\KycHandlerController::class, 'vendor'])->name('kyc-vendors');
+                Route::get('kyc-vendors', [\Fintech\Ekyc\Http\Controllers\KycHandlerController::class, 'vendor'])->name('kyc-vendors');
             });
         });
 }
