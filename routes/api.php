@@ -21,8 +21,9 @@ if (Config::get('fintech.ekyc.enabled')) {
             Route::post('kyc-statuses/{kyc_status}/restore', [\Fintech\Ekyc\Http\Controllers\KycStatusController::class, 'restore'])->name('kyc-statuses.restore');
             //DO NOT REMOVE THIS LINE//
             Route::withoutMiddleware(config('fintech.auth.middleware'))->group(function () {
-                Route::post('kyc-initialize', \Fintech\Ekyc\Http\Controllers\KycHandlerController::class)->name('kyc-initialize');
+                Route::post('kyc-verification', \Fintech\Ekyc\Http\Controllers\KycHandlerController::class)->name('kyc-verification');
                 Route::post('kyc-credential', [\Fintech\Ekyc\Http\Controllers\KycHandlerController::class, 'credential'])->name('kyc-credential');
+                Route::post('kyc-vendors', [\Fintech\Ekyc\Http\Controllers\KycHandlerController::class, 'vendor'])->name('kyc-vendors');
             });
         });
 }

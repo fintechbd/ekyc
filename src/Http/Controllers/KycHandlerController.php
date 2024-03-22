@@ -38,4 +38,31 @@ class KycHandlerController extends Controller
         return $this->success(['data' => $credentials]);
 
     }
+
+    /**
+     * @lrd:start
+     * this return current kyc vendors login credentials.
+     *
+     * @lrd:end
+     */
+    public function vendor(): JsonResponse
+    {
+
+        $providers = config("fintech.ekyc.providers");
+
+        $vendors = array_keys($providers);
+
+        $data = [];
+
+        foreach ($vendors as $vendor) {
+            $data[] = [
+                'vendor' => $vendor,
+                'countries' => $providers[$vendor]['countries'] ?? []
+            ];
+        }
+
+
+        return $this->success(['data' => $data]);
+
+    }
 }
