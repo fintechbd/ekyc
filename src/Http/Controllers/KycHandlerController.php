@@ -4,6 +4,7 @@ namespace Fintech\Ekyc\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Fintech\Core\Traits\ApiResponseTrait;
+use Fintech\Ekyc\Http\Requests\KycVerificationRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -14,7 +15,7 @@ class KycHandlerController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request)
+    public function __invoke(KycVerificationRequest $request)
     {
         //
     }
