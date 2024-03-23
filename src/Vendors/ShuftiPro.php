@@ -149,14 +149,14 @@ class ShuftiPro implements KycVendor
 
         $idType = \Fintech\Auth\Facades\Auth::idDocType()->find($data['id_doc_type_id']);
 
-        if (!$idType) {
+        if (! $idType) {
             throw (new ModelNotFoundException())->setModel(config('fintech.auth.id_doc_type_model', \Fintech\Auth\Models\IdDocType::class), $data['id_doc_type_id']);
         }
 
         $idType->load('country');
         $this->payload['country'] = strtoupper($idType->country->iso2);
         $document['supported_types'] = Arr::wrap($idType->id_doc_type_data['shuftipro_document_type'] ?? 'any');
-        $document['backside_proof_required'] = (string)($idType->sides ?? '0');
+        $document['backside_proof_required'] = (string) ($idType->sides ?? '0');
         $document['allow_ekyc'] = '0';
         $document['verification_instructions'] = [
             'allow_paper_based' => '1',
