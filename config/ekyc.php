@@ -17,7 +17,7 @@ return [
     |--------------------------------------------------------------------------
     | When KYC is initialed which vendor will be used to proceed.
     */
-    'default' => 'manual',
+    'default' => env('PACKAGE_EKYC_DRIVER', 'manual'),
 
     /*
     |--------------------------------------------------------------------------

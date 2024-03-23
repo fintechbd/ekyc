@@ -2,16 +2,21 @@
 
 namespace Fintech\Ekyc\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Fintech\Core\Traits\ApiResponseTrait;
 use Fintech\Ekyc\Facades\Ekyc;
 use Fintech\Ekyc\Http\Requests\KycVerificationRequest;
+use Fintech\Ekyc\Interfaces\KycVendor;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 
 class KycHandlerController extends Controller
 {
     use ApiResponseTrait;
+
+    public function __construct(private readonly KycVendor $kycVendor)
+    {
+
+    }
 
     /**
      * Handle the incoming request.
