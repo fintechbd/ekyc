@@ -81,7 +81,7 @@ return [
                 'decline_on_single_step' => '1',
                 'enhanced_originality_checks' => '1',
                 'manual_review' => '0',
-            ]
+            ],
         ],
         'signzy' => [
             'mode' => 'sandbox',
