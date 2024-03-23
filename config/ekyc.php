@@ -32,6 +32,15 @@ return [
 
     'root_prefix' => 'test/',
 
+    /*
+    |--------------------------------------------------------------------------
+    | KYC Service Providers
+    |--------------------------------------------------------------------------
+    |
+    | This value will be added to all your routes from this package
+    |
+    */
+
     'providers' => [
         'manual' => [
             'mode' => 'live',
@@ -62,6 +71,17 @@ return [
                 'username' => env('PACKAGE_EKYC_SHUFTIPRO_ID', null),
                 'password' => env('PACKAGE_EKYC_SHUFTIPRO_SECRET', null),
             ],
+            'options' => [
+                'language' => strtoupper(config('app.locale', '')),
+                'verification_mode' => 'any',
+                'allow_offline' => '1',
+                'allow_online' => '0',
+                'allow_retry' => '1',
+                'show_consent' => '0',
+                'decline_on_single_step' => '1',
+                'enhanced_originality_checks' => '1',
+                'manual_review' => '0',
+            ]
         ],
         'signzy' => [
             'mode' => 'sandbox',
@@ -79,6 +99,18 @@ return [
             ],
         ],
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | KYC Reference Token
+    |--------------------------------------------------------------------------
+    |
+    | This value will be added to all your routes from this package
+    |
+    */
+
+    'reference_prefix' => 'KYC',
+    'reference_count' => 0,
 
     /*
     |--------------------------------------------------------------------------

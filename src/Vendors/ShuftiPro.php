@@ -7,6 +7,7 @@ use Fintech\Ekyc\Enums\KycAction;
 use Fintech\Ekyc\Facades\Ekyc;
 use Fintech\Ekyc\Interfaces\KycVendor;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 
 class ShuftiPro implements KycVendor
@@ -35,22 +36,7 @@ class ShuftiPro implements KycVendor
             'password' => null,
         ]);
 
-        $this->payload = [
-            'reference' => '',
-            'country' => '', //id issue county
-            'language' => config('app.locale'),
-            'email' => '',
-            'verification_mode' => 'any',
-            'allow_offline' => '1',
-            'allow_online' => '0',
-            'allow_retry' => '1',
-            'show_consent' => '0',
-            'decline_on_single_step' => '1',
-            'enhanced_originality_checks' => '1',
-            'manual_review' => '0',
-        ];
-
-        $this->userModel = null;
+        $this->payload = $this->config['options'];
     }
 
     /**
@@ -157,14 +143,20 @@ class ShuftiPro implements KycVendor
         return $this;
     }
 
-    public function identity(): self
+    public function identity(array $data = []): self
     {
-        $this->userModelConfiguredCheck();
-
         $this->type = 'identity';
 
-        $document['supported_types'] = [$this->profileModel->id_type ?? 'passport'];
-        $document['backside_proof_required'] = '0';
+        $idType = \Fintech\Auth\Facades\Auth::idDocType()->find($data['id_doc_type_id']);
+
+        if (!$idType) {
+            throw (new ModelNotFoundException())->setModel(config('fintech.auth.id_doc_type_model', \Fintech\Auth\Models\IdDocType::class), $data['id_doc_type_id']);
+        }
+
+        $idType->load('country');
+        $this->payload['country'] = strtoupper($idType->country->iso2);
+        $document['supported_types'] = Arr::wrap($idType->id_doc_type_data['shuftipro_document_type'] ?? 'any');
+        $document['backside_proof_required'] = (string)($idType->sides ?? '0');
         $document['allow_ekyc'] = '0';
         $document['verification_instructions'] = [
             'allow_paper_based' => '1',
@@ -174,17 +166,17 @@ class ShuftiPro implements KycVendor
             'allow_cropped' => '1',
             'allow_scanned' => '1',
         ];
-        $document['verification_mode'] = 'any';
+        $document['verification_mode'] = 'image_only';
         $document['fetch_enhanced_data'] = '1';
         $document['name'] = [
-            'full_name' => $this->userModel->name ?? '',
+            'full_name' => $data['name'] ?? '',
             'fuzzy_match' => '1',
         ];
-        $document['dob'] = $this->profileModel->date_of_birth ?? '';
-        $document['issue_date'] = $this->profileModel->id_expired_at ?? '';
-        $document['expiry_date'] = $this->profileModel->id_expired_at ?? '';
-        $document['document_number'] = $this->profileModel->id_no ?? '';
-        $document['gender'] = ($this->profileModel->user_profile_data['gender']) ? substr(strtoupper($this->profileModel->user_profile_data['gender']), 0, 1) : 'M';
+        $document['dob'] = $data['date_of_birth'] ?? '';
+        $document['issue_date'] = $data['id_issue_at'] ?? '';
+        $document['expiry_date'] = $data['id_expired_at'] ?? '';
+        $document['document_number'] = $data['id_no'] ?? '';
+        $document['gender'] = ($data['gender']) ? substr(strtoupper($data['gender']), 0, 1) : 'M';
         $document['age'] = [
             'min' => '18',
             'max' => '65',

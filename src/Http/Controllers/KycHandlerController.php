@@ -4,6 +4,7 @@ namespace Fintech\Ekyc\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Fintech\Core\Traits\ApiResponseTrait;
+use Fintech\Ekyc\Facades\Ekyc;
 use Fintech\Ekyc\Http\Requests\KycVerificationRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -64,5 +65,17 @@ class KycHandlerController extends Controller
 
         return $this->success(['data' => $data]);
 
+    }
+
+    /**
+     * @lrd:start
+     * this return kyc vendor reference token and
+     * increment the internal count by one.
+     *
+     * @lrd:end
+     */
+    public function token(): JsonResponse
+    {
+        return $this->success(['data' => ['reference_no' => Ekyc::getReferenceToken()]]);
     }
 }

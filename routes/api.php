@@ -24,6 +24,7 @@ if (Config::get('fintech.ekyc.enabled')) {
                 Route::post('kyc-verification', \Fintech\Ekyc\Http\Controllers\KycHandlerController::class)->name('kyc-verification');
                 Route::post('kyc-credential', [\Fintech\Ekyc\Http\Controllers\KycHandlerController::class, 'credential'])->name('kyc-credential');
                 Route::get('kyc-vendors', [\Fintech\Ekyc\Http\Controllers\KycHandlerController::class, 'vendor'])->name('kyc-vendors');
+                Route::get('kyc-token', [\Fintech\Ekyc\Http\Controllers\KycHandlerController::class, 'token'])->name('kyc-vendors');
             });
         });
 }
