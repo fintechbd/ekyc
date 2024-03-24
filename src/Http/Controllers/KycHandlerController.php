@@ -2,9 +2,11 @@
 
 namespace Fintech\Ekyc\Http\Controllers;
 
+use Exception;
 use Fintech\Core\Traits\ApiResponseTrait;
 use Fintech\Ekyc\Facades\Ekyc;
 use Fintech\Ekyc\Http\Requests\KycVerificationRequest;
+use Fintech\Ekyc\Http\Resources\KycVerificationResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -16,23 +18,24 @@ class KycHandlerController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function verification(KycVerificationRequest $request, ?string $vendor = null)
+    public function verification(KycVerificationRequest $request, ?string $vendor = null): JsonResponse|KycVerificationResource
     {
-        if ($vendor == null) {
-            $vendor = config('fintech.ekyc.default', 'manual');
+        try {
+
+            if ($vendor == null) {
+                $vendor = config('fintech.ekyc.default', 'manual');
+            }
+
+            $inputs = $request->validated();
+
+            $kycStatus = Ekyc::kycStatus()->create($vendor, $inputs);
+
+            return new KycVerificationResource($kycStatus);
+
+        } catch (Exception $exception) {
+
+            return $this->failed($exception->getMessage());
         }
-
-        $inputs = $request->validated();
-
-        $kycStatus = Ekyc::kycStatus()->create($vendor, $inputs);
-
-        $this->success([
-            'data' => [
-                'vendor' => $vendor,
-                'response' => $kycStatus->response ?? [],
-            ],
-        ]);
-
     }
 
     /**

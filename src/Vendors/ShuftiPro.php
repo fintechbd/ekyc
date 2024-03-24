@@ -15,10 +15,6 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
 {
     public $action;
 
-    private $userModel;
-
-    private $profileModel;
-
     private string $type;
 
     public function __construct()
@@ -53,7 +49,7 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
 
         $this->response = $response->json();
 
-        logger('Shufti Pro Response', [$response->json()]);
+        logger('Shufti Pro Response', [$response->status(), $response->json()]);
 
         $this->validateResponse($response);
     }
@@ -140,19 +136,8 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
         $this->call('/');
     }
 
-    private function userModelConfiguredCheck(): void
-    {
-        $class = config('fintech.auth.user_model', \Fintech\Auth\Models\User::class);
-
-        if ($this->userModel == null || $this->userModel instanceof $class) {
-            throw new \InvalidArgumentException('Before setting verification use the `user()` method call.');
-        }
-    }
-
     public function address(string $reference, array $data = []): self
     {
-        $this->userModelConfiguredCheck();
-
         $this->type = 'address';
 
         return $this;
