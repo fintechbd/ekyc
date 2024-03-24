@@ -33,7 +33,10 @@ interface KycVendor
     public function user(string|int $id): self;
 
     public function identity(array $data = []): self;
-    public function reference(string $reference = null): string|self;
+
+    public function reference(?string $reference = null): string|self;
+
     public function getPayload(): mixed;
+
     public function getResponse(): mixed;
 }

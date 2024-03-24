@@ -8,6 +8,7 @@ use Fintech\Ekyc\Interfaces\KycVendor;
 
 /**
  * Class KycStatusService
+ *
  * @property-read KycVendor $kycVendor
  * @property-read KycStatusRepository $kycStatusRepository
  */
@@ -15,11 +16,9 @@ class KycStatusService
 {
     /**
      * KycStatusService constructor.
-     * @param KycStatusRepository $kycStatusRepository
-     * @param KycVendor $kycVendor
      */
     public function __construct(private readonly KycStatusRepository $kycStatusRepository,
-                                private readonly KycVendor           $kycVendor)
+        private readonly KycVendor $kycVendor)
     {
     }
 
@@ -44,9 +43,9 @@ class KycStatusService
 
         $this->kycVendor->reference($data['reference_no'])->identity($inputs)->verify();
 
-
         $data['request'] = $this->kycVendor->getPayload();
         $data['response'] = $this->kycVendor->getResponse();
+
         return $this->kycStatusRepository->create($data);
     }
 
