@@ -40,16 +40,16 @@ class KycVerificationRequest extends FormRequest
             'photo' => ['string', 'nullable'],
             'documents' => ['array', 'required', 'min:1'],
             'documents.*.type' => ['string', 'required'],
-            'documents.*.back' => ['string', 'required_without:documents.*.front'],
-            'documents.*.front' => ['string', 'required_without:documents.*.back'],
-            'employer' => ['array', 'nullable'],
-            'employer.company_name' => ['string', 'nullable'],
-            'employer.company_address' => ['string', 'nullable'],
-            'employer.company_registration_number' => ['string', 'nullable'],
-            'proof_of_address' => ['array', 'required', 'min:1'],
-            'proof_of_address.*.type' => ['string', 'required'],
-            'proof_of_address.*.front' => ['string', 'required_without:proof_of_address.*.back'],
-            'proof_of_address.*.back' => ['string', 'required_without:proof_of_address.*.front'],
+            'documents.*.back' => ['nullable', 'string', 'required_without:documents.*.front'],
+            'documents.*.front' => ['nullable', 'string', 'required_without:documents.*.back'],
+//            'employer' => ['array', 'nullable'],
+//            'employer.company_name' => ['string', 'nullable'],
+//            'employer.company_address' => ['string', 'nullable'],
+//            'employer.company_registration_number' => ['string', 'nullable'],
+//            'proof_of_address' => ['array', 'required', 'min:1'],
+//            'proof_of_address.*.type' => ['string', 'required'],
+//            'proof_of_address.*.front' => ['string', 'required_without:proof_of_address.*.back'],
+//            'proof_of_address.*.back' => ['string', 'required_without:proof_of_address.*.front'],
             'date_of_birth' => ['date', 'nullable'],
             'permanent_address' => ['string', 'nullable'],
             'permanent_city_id' => ['integer', 'nullable'],
@@ -63,10 +63,5 @@ class KycVerificationRequest extends FormRequest
             'present_post_code' => ['string', 'nullable'],
             'nationality' => ['string', 'nullable'],
         ];
-    }
-
-    protected function prepareForValidation()
-    {
-        dd($this->all());
     }
 }

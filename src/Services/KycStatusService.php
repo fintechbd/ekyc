@@ -5,6 +5,7 @@ namespace Fintech\Ekyc\Services;
 use Fintech\Ekyc\Facades\Ekyc;
 use Fintech\Ekyc\Interfaces\KycStatusRepository;
 use Fintech\Ekyc\Interfaces\KycVendor;
+use Illuminate\Support\Arr;
 
 /**
  * Class KycStatusService
@@ -39,12 +40,12 @@ class KycStatusService
         $data['vendor'] = 'shufti_pro';
         $data['status'] = 'pending';
         $data['note'] = 'This is a testing request.';
-        $data['key_status_data'] = [];
+        $data['kyc_status_data'] = [];
 
         $this->kycVendor->reference($data['reference_no'])->identity($inputs)->verify();
 
-        $data['request'] = $this->kycVendor->getPayload();
-        $data['response'] = $this->kycVendor->getResponse();
+        $data['request'] = Arr::wrap($this->kycVendor->getPayload());
+        $data['response'] = Arr::wrap($this->kycVendor->getResponse());
 
         return $this->kycStatusRepository->create($data);
     }

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('key_statuses', function (Blueprint $table) {
+        Schema::create('kyc_statuses', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable();
             $table->string('reference_no')->nullable();
@@ -38,6 +38,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('key_statuses');
+        Schema::dropIfExists('kyc_statuses');
     }
 };

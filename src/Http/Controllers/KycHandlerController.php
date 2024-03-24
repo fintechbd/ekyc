@@ -4,6 +4,7 @@ namespace Fintech\Ekyc\Http\Controllers;
 
 use Fintech\Core\Traits\ApiResponseTrait;
 use Fintech\Ekyc\Facades\Ekyc;
+use Fintech\Ekyc\Http\Requests\KycVerificationRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -15,13 +16,23 @@ class KycHandlerController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function verification(Request $request)
+    public function verification(KycVerificationRequest $request, string $vendor = null)
     {
-        //        $inputs = $request->validated();
+        if ($vendor == null) {
+            $vendor = config('fintech.ekyc.default', 'manual');
+        }
 
-        dd($request->all());
+        $inputs = $request->validated();
 
-        Ekyc::kycStatus()->create($inputs);
+        $kycStatus = Ekyc::kycStatus()->create($inputs);
+
+        $this->success([
+            'data' => [
+                'vendor' => $vendor,
+                'response' => $kycStatus->response ?? []
+            ],
+        ]);
+
     }
 
     /**
@@ -91,5 +102,10 @@ class KycHandlerController extends Controller
     public function token(): JsonResponse
     {
         return $this->success(['data' => ['reference_no' => Ekyc::getReferenceToken()]]);
+    }
+
+    public function statusCallback(Request $request)
+    {
+        logger("Call Back", $request->all());
     }
 }

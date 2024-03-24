@@ -39,7 +39,7 @@ class ShuftiPro implements KycVendor
             'password' => null,
         ]);
 
-        $this->payload = $this->config['options'];
+        $this->payload = config("fintech.ekyc.providers.shufti_pro.options");
     }
 
     /**
@@ -50,8 +50,9 @@ class ShuftiPro implements KycVendor
         if (! $this->config['username'] || ! $this->config['password']) {
             throw new \InvalidArgumentException('Shufti Pro Client ID & Secret Key is missing.');
         }
+        logger("Start Time : " . now());
 
-        $response = Http::withoutVerifying()
+        $response = Http::withoutVerifying()->timeout(120)
             ->withBasicAuth($this->config['username'], $this->config['password'])
             ->baseUrl($this->config['endpoint'])
             ->withHeaders([
@@ -59,7 +60,11 @@ class ShuftiPro implements KycVendor
                 'Accept' => 'application/json',
             ])->post($url, $this->payload);
 
-        logger('Shufti Pro', [$response->body()]);
+        logger("End Time : " . now());
+        $this->response = $response->json();
+
+        logger('Shufti Pro Payload', $this->payload);
+        logger('Shufti Pro Response', $response->json());
 
         $responseBody = $this->httpErrorHandler($response);
     }
@@ -159,9 +164,12 @@ class ShuftiPro implements KycVendor
         $idType->load('country');
 
         $this->payload['country'] = strtoupper($idType->country->iso2);
-
+        $this->payload['reference'] = $this->reference();
+        $this->payload['callback_url'] = route('ekyc.kyc.status-change-callback');
         $document['supported_types'] = Arr::wrap($idType->id_doc_type_data['shuftipro_document_type'] ?? 'any');
-        $document['backside_proof_required'] = (string) ($idType->sides ?? '0');
+        $document['proof'] = $data['documents'][0]['front'] ?? "";
+        $document['additional_proof'] = $data['documents'][1]['back'] ?? "";
+        $document['backside_proof_required'] = ($idType->sides == 1) ? "0" : "1";
         $document['allow_ekyc'] = '0';
         $document['verification_instructions'] = [
             'allow_paper_based' => '1',

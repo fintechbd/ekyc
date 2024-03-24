@@ -5,7 +5,6 @@ namespace Fintech\Ekyc;
 use Fintech\Ekyc\Commands\EkycCommand;
 use Fintech\Ekyc\Commands\InstallCommand;
 use Fintech\Ekyc\Interfaces\KycVendor;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider;
 
 class EkycServiceProvider extends ServiceProvider
@@ -24,7 +23,7 @@ class EkycServiceProvider extends ServiceProvider
         $this->app->register(RouteServiceProvider::class);
         $this->app->register(RepositoryServiceProvider::class);
 
-        $this->app->singleton(KycVendor::class, function (App $app) {
+        $this->app->singleton(KycVendor::class, function (\Illuminate\Foundation\Application $app) {
 
             $provider = config('fintech.ekyc.default', 'manual');
 
