@@ -27,7 +27,7 @@ class KycVerificationResource extends JsonResource
         return [
             'query' => [
                 'vendor' => $request->route('vendor', config('fintech.ekyc.default')),
-            ]
+            ],
         ];
     }
 }

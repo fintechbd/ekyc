@@ -5,11 +5,14 @@ namespace Fintech\Ekyc\Abstracts;
 class KycVendor
 {
     protected $config;
-    protected $payload;
-    protected $response;
-    protected string $note;
-    protected string $status;
 
+    protected $payload;
+
+    protected $response;
+
+    protected string $note;
+
+    protected string $status;
 
     public function getPayload(): mixed
     {
@@ -28,6 +31,6 @@ class KycVendor
 
     public function getNote(): string
     {
-       return $this->note;
+        return $this->note;
     }
 }
