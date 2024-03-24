@@ -39,7 +39,7 @@ class ShuftiPro implements KycVendor
             'password' => null,
         ]);
 
-        $this->payload = config("fintech.ekyc.providers.shufti_pro.options");
+        $this->payload = config('fintech.ekyc.providers.shufti_pro.options');
     }
 
     /**
@@ -50,7 +50,7 @@ class ShuftiPro implements KycVendor
         if (! $this->config['username'] || ! $this->config['password']) {
             throw new \InvalidArgumentException('Shufti Pro Client ID & Secret Key is missing.');
         }
-        logger("Start Time : " . now());
+        logger('Start Time : '.now());
 
         $response = Http::withoutVerifying()->timeout(120)
             ->withBasicAuth($this->config['username'], $this->config['password'])
@@ -60,7 +60,7 @@ class ShuftiPro implements KycVendor
                 'Accept' => 'application/json',
             ])->post($url, $this->payload);
 
-        logger("End Time : " . now());
+        logger('End Time : '.now());
         $this->response = $response->json();
 
         logger('Shufti Pro Payload', $this->payload);
@@ -167,9 +167,9 @@ class ShuftiPro implements KycVendor
         $this->payload['reference'] = $this->reference();
         $this->payload['callback_url'] = route('ekyc.kyc.status-change-callback');
         $document['supported_types'] = Arr::wrap($idType->id_doc_type_data['shuftipro_document_type'] ?? 'any');
-        $document['proof'] = $data['documents'][0]['front'] ?? "";
-        $document['additional_proof'] = $data['documents'][1]['back'] ?? "";
-        $document['backside_proof_required'] = ($idType->sides == 1) ? "0" : "1";
+        $document['proof'] = $data['documents'][0]['front'] ?? '';
+        $document['additional_proof'] = $data['documents'][1]['back'] ?? '';
+        $document['backside_proof_required'] = ($idType->sides == 1) ? '0' : '1';
         $document['allow_ekyc'] = '0';
         $document['verification_instructions'] = [
             'allow_paper_based' => '1',

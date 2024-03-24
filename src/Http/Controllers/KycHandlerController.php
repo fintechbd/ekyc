@@ -16,7 +16,7 @@ class KycHandlerController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function verification(KycVerificationRequest $request, string $vendor = null)
+    public function verification(KycVerificationRequest $request, ?string $vendor = null)
     {
         if ($vendor == null) {
             $vendor = config('fintech.ekyc.default', 'manual');
@@ -29,7 +29,7 @@ class KycHandlerController extends Controller
         $this->success([
             'data' => [
                 'vendor' => $vendor,
-                'response' => $kycStatus->response ?? []
+                'response' => $kycStatus->response ?? [],
             ],
         ]);
 
@@ -42,7 +42,7 @@ class KycHandlerController extends Controller
      *
      * @lrd:end
      */
-    public function credential(string $vendor = null): JsonResponse
+    public function credential(?string $vendor = null): JsonResponse
     {
         if ($vendor == null) {
             $vendor = config('fintech.ekyc.default');
@@ -57,11 +57,11 @@ class KycHandlerController extends Controller
         return $this->success([
             'data' => [
                 'credentials' => $credentials,
-                'options' => $config['options'] ?? []
+                'options' => $config['options'] ?? [],
             ],
             'query' => [
-                'vendor' => $vendor
-            ]
+                'vendor' => $vendor,
+            ],
         ]);
 
     }
@@ -106,6 +106,6 @@ class KycHandlerController extends Controller
 
     public function statusCallback(Request $request)
     {
-        logger("Call Back", $request->all());
+        logger('Call Back', $request->all());
     }
 }
