@@ -32,6 +32,8 @@ interface KycVendor
     public function getPayload(): mixed;
 
     public function getResponse(): mixed;
+
     public function getStatus(): string;
+
     public function getNote(): string;
 }

@@ -4,8 +4,8 @@ namespace Fintech\Ekyc\Vendors;
 
 use Fintech\Core\Enums\Ekyc\KycStatus;
 use Fintech\Core\Facades\Core;
-use Fintech\Ekyc\Enums\KycAction;
 use Fintech\Ekyc\Abstracts\KycVendor as AbstractsKycVendor;
+use Fintech\Ekyc\Enums\KycAction;
 use Fintech\Ekyc\Interfaces\KycVendor;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
@@ -35,7 +35,7 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
      */
     private function call(string $url = '/')
     {
-        if (!$this->config['username'] || !$this->config['password']) {
+        if (! $this->config['username'] || ! $this->config['password']) {
             throw new \InvalidArgumentException('Shufti Pro Client ID & Secret Key is missing.');
         }
 
@@ -90,7 +90,7 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
             'verification.declined' => $response['declined_reason'] ?? 'Request was valid and declined after verification.',
             'verification.accepted' => 'Document KYC Verification Completed.',
             'request.invalid' => $response['error']['message'] ?? 'The given data is invalid',
-            default => 'Documents are collected and request is pending for admin to review and Accept/Decline. Reference No: #' . $response['reference'],
+            default => 'Documents are collected and request is pending for admin to review and Accept/Decline. Reference No: #'.$response['reference'],
         };
     }
 
@@ -99,13 +99,13 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
      */
     public function user(string|int $id): self
     {
-        if (!Core::packageExists('Auth')) {
+        if (! Core::packageExists('Auth')) {
             throw new \InvalidArgumentException('`Auth` package is missing from the system.');
         }
 
         $user = \Fintech\Auth\Facades\Auth::user()->find($id);
 
-        if (!$user) {
+        if (! $user) {
             throw (new ModelNotFoundException())->setModel(config('fintech.auth.user_model', \Fintech\Auth\Models\User::class), $id);
         }
 
@@ -149,7 +149,7 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
 
         $idType = \Fintech\MetaData\Facades\MetaData::idDocType()->find($data['id_doc_type_id']);
 
-        if (!$idType) {
+        if (! $idType) {
             throw (new ModelNotFoundException())->setModel(config('fintech.auth.id_doc_type_model', \Fintech\MetaData\Models\IdDocType::class), $data['id_doc_type_id']);
         }
 

@@ -19,7 +19,7 @@ class KycStatusService
      * KycStatusService constructor.
      */
     public function __construct(private readonly KycStatusRepository $kycStatusRepository,
-                                private readonly KycVendor           $kycVendor)
+        private readonly KycVendor $kycVendor)
     {
     }
 
