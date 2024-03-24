@@ -4,7 +4,6 @@ namespace Fintech\Ekyc\Vendors;
 
 use Fintech\Core\Facades\Core;
 use Fintech\Ekyc\Enums\KycAction;
-use Fintech\Ekyc\Facades\Ekyc;
 use Fintech\Ekyc\Interfaces\KycVendor;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
@@ -21,11 +20,13 @@ class ShuftiPro implements KycVendor
     private $profileModel;
 
     private $kycStatusModel;
+
     private string $reference;
 
     private array $payload;
 
     private string $type;
+
     private $response;
 
     public function __construct()
@@ -46,7 +47,7 @@ class ShuftiPro implements KycVendor
      */
     private function call(string $url = '/')
     {
-        if (!$this->config['username'] || !$this->config['password']) {
+        if (! $this->config['username'] || ! $this->config['password']) {
             throw new \InvalidArgumentException('Shufti Pro Client ID & Secret Key is missing.');
         }
 
@@ -58,7 +59,7 @@ class ShuftiPro implements KycVendor
                 'Accept' => 'application/json',
             ])->post($url, $this->payload);
 
-        logger("Shufti Pro", [$response->body()]);
+        logger('Shufti Pro', [$response->body()]);
 
         $responseBody = $this->httpErrorHandler($response);
     }
@@ -90,13 +91,13 @@ class ShuftiPro implements KycVendor
      */
     public function user(string|int $id): self
     {
-        if (!Core::packageExists('Auth')) {
+        if (! Core::packageExists('Auth')) {
             throw new \InvalidArgumentException('`Auth` package is missing from the system.');
         }
 
         $user = \Fintech\Auth\Facades\Auth::user()->find($id);
 
-        if (!$user) {
+        if (! $user) {
             throw (new ModelNotFoundException())->setModel(config('fintech.auth.user_model', \Fintech\Auth\Models\User::class), $id);
         }
 
@@ -151,7 +152,7 @@ class ShuftiPro implements KycVendor
 
         $idType = \Fintech\Auth\Facades\Auth::idDocType()->find($data['id_doc_type_id']);
 
-        if (!$idType) {
+        if (! $idType) {
             throw (new ModelNotFoundException())->setModel(config('fintech.auth.id_doc_type_model', \Fintech\Auth\Models\IdDocType::class), $data['id_doc_type_id']);
         }
 
@@ -160,7 +161,7 @@ class ShuftiPro implements KycVendor
         $this->payload['country'] = strtoupper($idType->country->iso2);
 
         $document['supported_types'] = Arr::wrap($idType->id_doc_type_data['shuftipro_document_type'] ?? 'any');
-        $document['backside_proof_required'] = (string)($idType->sides ?? '0');
+        $document['backside_proof_required'] = (string) ($idType->sides ?? '0');
         $document['allow_ekyc'] = '0';
         $document['verification_instructions'] = [
             'allow_paper_based' => '1',
@@ -201,10 +202,11 @@ class ShuftiPro implements KycVendor
         ]);
     }
 
-    public function reference(string $reference = null): string|self
+    public function reference(?string $reference = null): string|self
     {
         if ($reference != null) {
             $this->reference = $reference;
+
             return $this;
         }
 

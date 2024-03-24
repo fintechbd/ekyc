@@ -5,7 +5,6 @@ namespace Fintech\Ekyc\Http\Controllers;
 use Fintech\Core\Traits\ApiResponseTrait;
 use Fintech\Ekyc\Facades\Ekyc;
 use Fintech\Ekyc\Http\Requests\KycVerificationRequest;
-use Fintech\Ekyc\Interfaces\KycVendor;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 
