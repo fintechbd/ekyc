@@ -20,23 +20,18 @@ interface KycVendor
     public function verify();
 
     /**
-     * make a request o kyc partner to erase verification document
-     * previously provided
-     *
-     * @return mixed
+     * load the user that will go to kyc verification
      */
-    public function delete(string $reference, array $options = []);
+    public function identity(string $reference, array $data = []): self;
 
     /**
      * load the user that will go to kyc verification
      */
-    public function user(string|int $id): self;
-
-    public function identity(array $data = []): self;
-
-    public function reference(?string $reference = null): string|self;
+    public function address(string $reference, array $data = []): self;
 
     public function getPayload(): mixed;
 
     public function getResponse(): mixed;
+    public function getStatus(): string;
+    public function getNote(): string;
 }

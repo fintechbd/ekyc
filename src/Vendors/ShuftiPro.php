@@ -4,30 +4,21 @@ namespace Fintech\Ekyc\Vendors;
 
 use Fintech\Core\Facades\Core;
 use Fintech\Ekyc\Enums\KycAction;
+use Fintech\Ekyc\Abstracts\KycVendor as AbstractsKycVendor;
 use Fintech\Ekyc\Interfaces\KycVendor;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 
-class ShuftiPro implements KycVendor
+class ShuftiPro extends AbstractsKycVendor implements KycVendor
 {
-    public $config;
-
     public $action;
 
     private $userModel;
 
     private $profileModel;
 
-    private $kycStatusModel;
-
-    private string $reference;
-
-    private array $payload;
-
     private string $type;
-
-    private $response;
 
     public function __construct()
     {
@@ -66,13 +57,13 @@ class ShuftiPro implements KycVendor
         logger('Shufti Pro Payload', $this->payload);
         logger('Shufti Pro Response', $response->json());
 
-        $responseBody = $this->httpErrorHandler($response);
+        $responseBody = $this->errorHandler($response);
     }
 
-    private function httpErrorHandler(\Illuminate\Http\Client\Response $response)
+    private function errorHandler(\Illuminate\Http\Client\Response $response): array
     {
         return match ($response->status()) {
-            200 => $response->json(),
+            200 => ['message' => $this->eventStatusHandler($response->json()), 'body' => $response->json()],
             400 => ['message' => 'Bad Request: one or more parameter is invalid or missing'],
             401 => ['message' => 'Unauthorized: invalid signature key provided in the request'],
             402 => ['message' => 'Request Failed: invalid request data: missing required parameters'],
@@ -86,8 +77,9 @@ class ShuftiPro implements KycVendor
         };
     }
 
-    private function eventStatusHandler(array $response)
+    private function eventStatusHandler(array $response): array
     {
+        return [];
 
     }
 
@@ -142,7 +134,7 @@ class ShuftiPro implements KycVendor
         }
     }
 
-    public function address(): self
+    public function address(string $reference, array $data = []): self
     {
         $this->userModelConfiguredCheck();
 
@@ -151,7 +143,7 @@ class ShuftiPro implements KycVendor
         return $this;
     }
 
-    public function identity(array $data = []): self
+    public function identity(string $reference, array $data = []): self
     {
         $this->type = 'identity';
 
@@ -164,8 +156,9 @@ class ShuftiPro implements KycVendor
         $idType->load('country');
 
         $this->payload['country'] = strtoupper($idType->country->iso2);
-        $this->payload['reference'] = $this->reference();
+        $this->payload['reference'] = $reference;
         $this->payload['callback_url'] = route('ekyc.kyc.status-change-callback');
+
         $document['supported_types'] = Arr::wrap($idType->id_doc_type_data['shuftipro_document_type'] ?? 'any');
         $document['proof'] = $data['documents'][0]['front'] ?? '';
         $document['additional_proof'] = $data['documents'][1]['back'] ?? '';
@@ -204,36 +197,5 @@ class ShuftiPro implements KycVendor
         $this->payload['document'] = $document;
 
         return $this;
-    }
-
-    public function delete(string $reference, array $options = [])
-    {
-        $this->action = KycAction::Cancellation;
-
-        $this->call('/delete', [
-            'reference' => $reference,
-            'comment' => $options['note'] ?? 'Invalid or updated document will be provided later.',
-        ]);
-    }
-
-    public function reference(?string $reference = null): string|self
-    {
-        if ($reference != null) {
-            $this->reference = $reference;
-
-            return $this;
-        }
-
-        return $this->reference;
-    }
-
-    public function getPayload(): mixed
-    {
-        return $this->payload;
-    }
-
-    public function getResponse(): mixed
-    {
-        return $this->response;
     }
 }

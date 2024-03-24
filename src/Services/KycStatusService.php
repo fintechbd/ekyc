@@ -19,7 +19,7 @@ class KycStatusService
      * KycStatusService constructor.
      */
     public function __construct(private readonly KycStatusRepository $kycStatusRepository,
-        private readonly KycVendor $kycVendor)
+                                private readonly KycVendor           $kycVendor)
     {
     }
 
@@ -32,20 +32,19 @@ class KycStatusService
 
     }
 
-    public function create(array $inputs = [])
+    public function create(string $vendor, array $inputs = [])
     {
         $data['reference_no'] = Ekyc::getReferenceToken();
         $data['type'] = 'document';
         $data['attempts'] = 1;
-        $data['vendor'] = 'shufti_pro';
-        $data['status'] = 'pending';
+        $data['vendor'] = $vendor;
         $data['note'] = 'This is a testing request.';
         $data['kyc_status_data'] = [];
 
-        $this->kycVendor->reference($data['reference_no'])->identity($inputs)->verify();
-
+        $this->kycVendor->identity($data['reference_no'], $inputs)->verify();
         $data['request'] = Arr::wrap($this->kycVendor->getPayload());
         $data['response'] = Arr::wrap($this->kycVendor->getResponse());
+        $data['status'] = $this->kycVendor->getStatus();
 
         return $this->kycStatusRepository->create($data);
     }

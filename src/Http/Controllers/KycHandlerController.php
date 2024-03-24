@@ -24,7 +24,7 @@ class KycHandlerController extends Controller
 
         $inputs = $request->validated();
 
-        $kycStatus = Ekyc::kycStatus()->create($inputs);
+        $kycStatus = Ekyc::kycStatus()->create($vendor, $inputs);
 
         $this->success([
             'data' => [
