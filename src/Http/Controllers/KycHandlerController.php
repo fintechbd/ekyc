@@ -4,7 +4,6 @@ namespace Fintech\Ekyc\Http\Controllers;
 
 use Fintech\Core\Traits\ApiResponseTrait;
 use Fintech\Ekyc\Facades\Ekyc;
-use Fintech\Ekyc\Http\Requests\KycVerificationRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -18,7 +17,7 @@ class KycHandlerController extends Controller
      */
     public function verification(Request $request)
     {
-//        $inputs = $request->validated();
+        //        $inputs = $request->validated();
 
         dd($request->all());
 
