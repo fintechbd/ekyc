@@ -13,17 +13,16 @@ class KycHandlerController extends Controller
 {
     use ApiResponseTrait;
 
-    public function __construct(private readonly KycVendor $kycVendor)
-    {
-
-    }
-
     /**
      * Handle the incoming request.
      */
     public function __invoke(KycVerificationRequest $request)
     {
-        //
+        $inputs = $request->validated();
+
+        dd($inputs);
+
+        Ekyc::kycStatus()->create($inputs);
     }
 
     /**

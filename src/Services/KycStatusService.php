@@ -2,19 +2,25 @@
 
 namespace Fintech\Ekyc\Services;
 
+use Fintech\Ekyc\Facades\Ekyc;
 use Fintech\Ekyc\Interfaces\KycStatusRepository;
+use Fintech\Ekyc\Interfaces\KycVendor;
 
 /**
  * Class KycStatusService
+ * @property-read KycVendor $kycVendor
+ * @property-read KycStatusRepository $kycStatusRepository
  */
 class KycStatusService
 {
     /**
      * KycStatusService constructor.
+     * @param KycStatusRepository $kycStatusRepository
+     * @param KycVendor $kycVendor
      */
-    public function __construct(KycStatusRepository $kycStatusRepository)
+    public function __construct(private readonly KycStatusRepository $kycStatusRepository,
+                                private readonly KycVendor           $kycVendor)
     {
-        $this->kycStatusRepository = $kycStatusRepository;
     }
 
     /**
@@ -28,7 +34,20 @@ class KycStatusService
 
     public function create(array $inputs = [])
     {
-        return $this->kycStatusRepository->create($inputs);
+        $data['reference_no'] = Ekyc::getReferenceToken();
+        $data['type'] = 'document';
+        $data['attempts'] = 1;
+        $data['vendor'] = 'shufti_pro';
+        $data['status'] = 'pending';
+        $data['note'] = 'This is a testing request.';
+        $data['key_status_data'] = [];
+
+        $this->kycVendor->reference($data['reference_no'])->identity($inputs)->verify();
+
+
+        $data['request'] = $this->kycVendor->getPayload();
+        $data['response'] = $this->kycVendor->getResponse();
+        return $this->kycStatusRepository->create($data);
     }
 
     public function find($id, $onlyTrashed = false)
