@@ -195,6 +195,12 @@ class ShuftiPro implements KycVendor
             'max' => '65',
         ];
 
+        if (isset($data['photo'])) {
+            $face['proof'] = $data['photo'] ?? '';
+            $face['check_duplicate_request'] = "0";
+            $this->payload['face'] = $face;
+        }
+
         $this->payload['document'] = $document;
 
         return $this;
