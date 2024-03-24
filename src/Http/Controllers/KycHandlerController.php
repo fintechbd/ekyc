@@ -27,21 +27,32 @@ class KycHandlerController extends Controller
 
     /**
      * @lrd:start
-     * this return current enabled kyc vendor login credentials.
+     * this return any enabled kyc vendor login credentials and options.
+     * current available vendors list is avaliable in `/api/ekyc/kyv-vendors`
      *
      * @lrd:end
      */
-    public function credential(): JsonResponse
+    public function credential(string $vendor = null): JsonResponse
     {
-        $current = config('fintech.ekyc.default');
+        if ($vendor == null) {
+            $vendor = config('fintech.ekyc.default');
+        }
 
-        $config = config("fintech.ekyc.providers.{$current}");
+        $config = config("fintech.ekyc.providers.{$vendor}");
 
         $mode = $config['mode'] ?? 'sandbox';
 
         $credentials = $config[$mode] ?? [];
 
-        return $this->success(['data' => $credentials]);
+        return $this->success([
+            'data' => [
+                'credentials' => $credentials,
+                'options' => $config['options'] ?? []
+            ],
+            'query' => [
+                'vendor' => $vendor
+            ]
+        ]);
 
     }
 

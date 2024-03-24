@@ -56,6 +56,7 @@ return [
                 'username' => '7086UAT',
                 'password' => '7086@Pass',
             ],
+            'options' => []
         ],
         'shufti_pro' => [
             'mode' => 'sandbox',
@@ -97,6 +98,7 @@ return [
                 'username' => env('PACKAGE_EKYC_SHUFTIPRO_ID', null),
                 'password' => env('PACKAGE_EKYC_SHUFTIPRO_SECRET', null),
             ],
+            'options' => []
         ],
     ],
 
