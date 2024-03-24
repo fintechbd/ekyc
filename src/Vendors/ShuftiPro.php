@@ -155,10 +155,10 @@ class ShuftiPro implements KycVendor
     {
         $this->type = 'identity';
 
-        $idType = \Fintech\Auth\Facades\Auth::idDocType()->find($data['id_doc_type_id']);
+        $idType = \Fintech\MetaData\Facades\MetaData::idDocType()->find($data['id_doc_type_id']);
 
         if (! $idType) {
-            throw (new ModelNotFoundException())->setModel(config('fintech.auth.id_doc_type_model', \Fintech\Auth\Models\IdDocType::class), $data['id_doc_type_id']);
+            throw (new ModelNotFoundException())->setModel(config('fintech.auth.id_doc_type_model', \Fintech\MetaData\Models\IdDocType::class), $data['id_doc_type_id']);
         }
 
         $idType->load('country');
