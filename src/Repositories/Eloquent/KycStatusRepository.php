@@ -42,6 +42,10 @@ class KycStatusRepository extends EloquentRepository implements InterfacesKycSta
             $query->onlyTrashed();
         }
 
+        if (!empty($filters['reference_no'])) {
+            $query->where('reference_no', $filters['reference_no']);
+        }
+
         //Handle Sorting
         $query->orderBy($filters['sort'] ?? $this->model->getKeyName(), $filters['dir'] ?? 'asc');
 

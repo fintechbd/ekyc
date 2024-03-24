@@ -32,7 +32,12 @@ class KycStatusService
 
     }
 
-    public function create(string $vendor, array $inputs = [])
+    public function create(array $inputs = [])
+    {
+        return $this->kycStatusRepository->create($inputs);
+    }
+
+    public function verify(string $vendor, array $inputs = [])
     {
         $data['reference_no'] = Ekyc::getReferenceToken();
         $data['type'] = 'document';
@@ -46,7 +51,7 @@ class KycStatusService
         $data['status'] = $this->kycVendor->getStatus();
         $data['note'] = $this->kycVendor->getNote();
 
-        return $this->kycStatusRepository->create($data);
+        return $this->create($data);
     }
 
     public function find($id, $onlyTrashed = false)
