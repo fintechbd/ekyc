@@ -25,7 +25,6 @@ class KycVerificationRequest extends FormRequest
             'name' => ['required', 'string', 'min:2', 'max:255'],
             'mobile' => ['nullable', 'string', 'min:10'],
             'email' => ['nullable', 'string', 'email:rfc,dns', 'min:2', 'max:255'],
-            'language' => ['nullable', 'string'],
             'father_name' => ['string', 'nullable'],
             'mother_name' => ['string', 'nullable'],
             'gender' => ['string', 'nullable'],
@@ -64,5 +63,10 @@ class KycVerificationRequest extends FormRequest
             'present_post_code' => ['string', 'nullable'],
             'nationality' => ['string', 'nullable'],
         ];
+    }
+
+    protected function prepareForValidation()
+    {
+        dd($this->all());
     }
 }
