@@ -38,13 +38,13 @@ class KycStatusService
         $data['type'] = 'document';
         $data['attempts'] = 1;
         $data['vendor'] = $vendor;
-        $data['note'] = 'This is a testing request.';
-        $data['kyc_status_data'] = [];
+        $data['kyc_status_data'] = ['inputs' => $inputs];
 
         $this->kycVendor->identity($data['reference_no'], $inputs)->verify();
         $data['request'] = Arr::wrap($this->kycVendor->getPayload());
         $data['response'] = Arr::wrap($this->kycVendor->getResponse());
         $data['status'] = $this->kycVendor->getStatus();
+        $data['note'] = $this->kycVendor->getNote();
 
         return $this->kycStatusRepository->create($data);
     }

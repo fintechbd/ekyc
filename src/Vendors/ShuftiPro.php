@@ -2,6 +2,7 @@
 
 namespace Fintech\Ekyc\Vendors;
 
+use Fintech\Core\Enums\Ekyc\KycStatus;
 use Fintech\Core\Facades\Core;
 use Fintech\Ekyc\Enums\KycAction;
 use Fintech\Ekyc\Abstracts\KycVendor as AbstractsKycVendor;
@@ -38,10 +39,9 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
      */
     private function call(string $url = '/')
     {
-        if (! $this->config['username'] || ! $this->config['password']) {
+        if (!$this->config['username'] || !$this->config['password']) {
             throw new \InvalidArgumentException('Shufti Pro Client ID & Secret Key is missing.');
         }
-        logger('Start Time : '.now());
 
         $response = Http::withoutVerifying()->timeout(120)
             ->withBasicAuth($this->config['username'], $this->config['password'])
@@ -51,36 +51,51 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
                 'Accept' => 'application/json',
             ])->post($url, $this->payload);
 
-        logger('End Time : '.now());
         $this->response = $response->json();
 
-        logger('Shufti Pro Payload', $this->payload);
-        logger('Shufti Pro Response', $response->json());
+        logger('Shufti Pro Response', [$response->json()]);
 
-        $responseBody = $this->errorHandler($response);
+        $this->validateResponse($response);
     }
 
-    private function errorHandler(\Illuminate\Http\Client\Response $response): array
+    private function validateResponse(\Illuminate\Http\Client\Response $response): void
     {
-        return match ($response->status()) {
-            200 => ['message' => $this->eventStatusHandler($response->json()), 'body' => $response->json()],
-            400 => ['message' => 'Bad Request: one or more parameter is invalid or missing'],
-            401 => ['message' => 'Unauthorized: invalid signature key provided in the request'],
-            402 => ['message' => 'Request Failed: invalid request data: missing required parameters'],
-            403 => ['message' => 'Forbidden: service not allowed'],
-            404 => ['message' => 'Not Found: Resource not found'],
-            409 => ['message' => 'Conflict: Conflicting data: already exists'],
-            429 => ['message' => 'Too Many Attempts.'],
-            500 => ['message' => 'Internal Server Error'],
-            504 => ['message' => 'Server error'],
-            524 => ['message' => 'Timeout from Cloudflare'],
+        $this->status = KycStatus::Pending->value;
+
+        $this->note = match ($response->status()) {
+            200 => $this->eventStatusHandler($response->json()),
+            400 => 'Bad Request: one or more parameter is invalid or missing',
+            401 => 'Unauthorized: invalid signature key provided in the request',
+            402 => 'Request Failed: invalid request data: missing required parameters',
+            403 => 'Forbidden: service not allowed',
+            404 => 'Not Found: Resource not found',
+            409 => 'Conflict: Conflicting data: already exists',
+            429 => 'Too Many Attempts.',
+            500 => 'Internal Server Error',
+            504 => 'Server error',
+            524 => 'Timeout from Cloudflare',
         };
     }
 
-    private function eventStatusHandler(array $response): array
+    private function eventStatusHandler(array $response): string
     {
-        return [];
+        $event = $response['event'];
 
+        $this->status = match ($event) {
+            'request.deleted' => KycStatus::Cancelled->value,
+            'verification.declined' => KycStatus::Declined->value,
+            'verification.accepted' => KycStatus::Accepted->value,
+            'request.invalid' => KycStatus::Cancelled->value,
+            default => KycStatus::Pending->value,
+        };
+
+        return match ($event) {
+            'request.deleted' => 'Request has been deleted.',
+            'verification.declined' => $response['declined_reason'] ?? 'Request was valid and declined after verification.',
+            'verification.accepted' => 'Document KYC Verification Completed.',
+            'request.invalid' => $response['error']['message'] ?? 'The given data is invalid',
+            default => 'Documents are collected and request is pending for admin to review and Accept/Decline. Reference No: #' . $response['reference'],
+        };
     }
 
     /**
@@ -88,13 +103,13 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
      */
     public function user(string|int $id): self
     {
-        if (! Core::packageExists('Auth')) {
+        if (!Core::packageExists('Auth')) {
             throw new \InvalidArgumentException('`Auth` package is missing from the system.');
         }
 
         $user = \Fintech\Auth\Facades\Auth::user()->find($id);
 
-        if (! $user) {
+        if (!$user) {
             throw (new ModelNotFoundException())->setModel(config('fintech.auth.user_model', \Fintech\Auth\Models\User::class), $id);
         }
 
@@ -149,7 +164,7 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
 
         $idType = \Fintech\MetaData\Facades\MetaData::idDocType()->find($data['id_doc_type_id']);
 
-        if (! $idType) {
+        if (!$idType) {
             throw (new ModelNotFoundException())->setModel(config('fintech.auth.id_doc_type_model', \Fintech\MetaData\Models\IdDocType::class), $data['id_doc_type_id']);
         }
 
@@ -158,6 +173,7 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
         $this->payload['country'] = strtoupper($idType->country->iso2);
         $this->payload['reference'] = $reference;
         $this->payload['callback_url'] = route('ekyc.kyc.status-change-callback');
+        $this->payload['email'] = $data['email'] ?? '';
 
         $document['supported_types'] = Arr::wrap($idType->id_doc_type_data['shuftipro_document_type'] ?? 'any');
         $document['proof'] = $data['documents'][0]['front'] ?? '';
