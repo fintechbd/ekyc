@@ -4,6 +4,7 @@ namespace Fintech\Ekyc;
 
 use Fintech\Ekyc\Commands\EkycCommand;
 use Fintech\Ekyc\Commands\InstallCommand;
+use Fintech\Ekyc\Http\Requests\KycVerificationRequest;
 use Fintech\Ekyc\Interfaces\KycVendor;
 use Illuminate\Support\ServiceProvider;
 
@@ -21,16 +22,19 @@ class EkycServiceProvider extends ServiceProvider
         );
 
         $this->app->register(RouteServiceProvider::class);
+
         $this->app->register(RepositoryServiceProvider::class);
 
         $this->app->singleton(KycVendor::class, function (\Illuminate\Foundation\Application $app) {
 
-            $provider = config('fintech.ekyc.default', 'manual');
+            $request = $app->make(KycVerificationRequest::class);
 
-            $driver = config("fintech.ekyc.providers.{$provider}.driver");
+            $vendor = $request->route('vendor', config('fintech.ekyc.default', 'manual'));
+
+            $driver = config("fintech.ekyc.providers.{$vendor}.driver");
 
             if (! $driver) {
-                throw new \ErrorException("Missing driver for `{$provider}` kyc provider.");
+                throw new \ErrorException("Missing driver for `{$vendor}` kyc provider.");
             }
 
             return $app->make($driver);

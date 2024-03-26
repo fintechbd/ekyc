@@ -15,8 +15,6 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
 {
     public $action;
 
-    private string $type;
-
     public function __construct()
     {
         $mode = config('fintech.ekyc.providers.shufti_pro.mode', 'sandbox');
@@ -28,6 +26,103 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
         ]);
 
         $this->payload = config('fintech.ekyc.providers.shufti_pro.options');
+    }
+
+    /**
+     * @param string $reference
+     * @return void
+     */
+    public function status(string $reference)
+    {
+        $this->action = KycAction::StatusCheck;
+
+        $this->call('/status', [
+            'reference' => $reference,
+        ]);
+    }
+
+    /**
+     * @return void
+     */
+    public function verify()
+    {
+        $this->action = KycAction::Verification;
+
+        $this->call('/');
+    }
+
+    /**
+     * @param string $reference
+     * @param array $data
+     * @return $this
+     */
+    public function address(string $reference, array $data = []): self
+    {
+        $this->type = 'address';
+
+        return $this;
+    }
+
+    /**
+     * @param string $reference
+     * @param array $data
+     * @return $this
+     */
+    public function identity(string $reference, array $data = []): self
+    {
+        $this->type = 'identity';
+
+        $idType = \Fintech\MetaData\Facades\MetaData::idDocType()->find($data['id_doc_type_id']);
+
+        if (! $idType) {
+            throw (new ModelNotFoundException())->setModel(config('fintech.auth.id_doc_type_model', \Fintech\MetaData\Models\IdDocType::class), $data['id_doc_type_id']);
+        }
+
+        $idType->load('country');
+
+        $this->payload['country'] = strtoupper($idType->country->iso2);
+        $this->payload['reference'] = $reference;
+        $this->payload['callback_url'] = route('ekyc.kyc.status-change-callback');
+        $this->payload['email'] = $data['email'] ?? '';
+
+        $document['supported_types'] = Arr::wrap($idType->id_doc_type_data['shuftipro_document_type'] ?? 'any');
+        $document['proof'] = $data['documents'][0]['front'] ?? '';
+        $document['additional_proof'] = $data['documents'][1]['back'] ?? '';
+        $document['backside_proof_required'] = ($idType->sides == 1) ? '0' : '1';
+        $document['allow_ekyc'] = '0';
+        $document['verification_instructions'] = [
+            'allow_paper_based' => '1',
+            'allow_photocopy' => '1',
+            'allow_laminated' => '1',
+            'allow_screenshot' => '1',
+            'allow_cropped' => '1',
+            'allow_scanned' => '1',
+        ];
+        $document['verification_mode'] = 'image_only';
+        $document['fetch_enhanced_data'] = '1';
+        $document['name'] = [
+            'full_name' => $data['name'] ?? '',
+            'fuzzy_match' => '1',
+        ];
+        $document['dob'] = $data['date_of_birth'] ?? '';
+        $document['issue_date'] = $data['id_issue_at'] ?? '';
+        $document['expiry_date'] = $data['id_expired_at'] ?? '';
+        $document['document_number'] = $data['id_no'] ?? '';
+        $document['gender'] = ($data['gender']) ? substr(strtoupper($data['gender']), 0, 1) : 'M';
+        $document['age'] = [
+            'min' => '18',
+            'max' => '65',
+        ];
+
+        if (isset($data['photo'])) {
+            $face['proof'] = $data['photo'] ?? '';
+            $face['check_duplicate_request'] = '0';
+            $this->payload['face'] = $face;
+        }
+
+        $this->payload['document'] = $document;
+
+        return $this;
     }
 
     /**
@@ -94,109 +189,4 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
         };
     }
 
-    /**
-     * load the user that will go to kyc verification
-     */
-    public function user(string|int $id): self
-    {
-        if (! Core::packageExists('Auth')) {
-            throw new \InvalidArgumentException('`Auth` package is missing from the system.');
-        }
-
-        $user = \Fintech\Auth\Facades\Auth::user()->find($id);
-
-        if (! $user) {
-            throw (new ModelNotFoundException())->setModel(config('fintech.auth.user_model', \Fintech\Auth\Models\User::class), $id);
-        }
-
-        $user->load('profile');
-
-        $this->payload['email'] = $user->email ?? '';
-
-        $this->userModel = $user;
-
-        $this->profileModel = $user->profile;
-
-        return $this;
-    }
-
-    public function status(string $reference)
-    {
-        $this->action = KycAction::StatusCheck;
-
-        $this->call('/status', [
-            'reference' => $reference,
-        ]);
-    }
-
-    public function verify()
-    {
-        $this->action = KycAction::Verification;
-
-        $this->call('/');
-    }
-
-    public function address(string $reference, array $data = []): self
-    {
-        $this->type = 'address';
-
-        return $this;
-    }
-
-    public function identity(string $reference, array $data = []): self
-    {
-        $this->type = 'identity';
-
-        $idType = \Fintech\MetaData\Facades\MetaData::idDocType()->find($data['id_doc_type_id']);
-
-        if (! $idType) {
-            throw (new ModelNotFoundException())->setModel(config('fintech.auth.id_doc_type_model', \Fintech\MetaData\Models\IdDocType::class), $data['id_doc_type_id']);
-        }
-
-        $idType->load('country');
-
-        $this->payload['country'] = strtoupper($idType->country->iso2);
-        $this->payload['reference'] = $reference;
-        $this->payload['callback_url'] = route('ekyc.kyc.status-change-callback');
-        $this->payload['email'] = $data['email'] ?? '';
-
-        $document['supported_types'] = Arr::wrap($idType->id_doc_type_data['shuftipro_document_type'] ?? 'any');
-        $document['proof'] = $data['documents'][0]['front'] ?? '';
-        $document['additional_proof'] = $data['documents'][1]['back'] ?? '';
-        $document['backside_proof_required'] = ($idType->sides == 1) ? '0' : '1';
-        $document['allow_ekyc'] = '0';
-        $document['verification_instructions'] = [
-            'allow_paper_based' => '1',
-            'allow_photocopy' => '1',
-            'allow_laminated' => '1',
-            'allow_screenshot' => '1',
-            'allow_cropped' => '1',
-            'allow_scanned' => '1',
-        ];
-        $document['verification_mode'] = 'image_only';
-        $document['fetch_enhanced_data'] = '1';
-        $document['name'] = [
-            'full_name' => $data['name'] ?? '',
-            'fuzzy_match' => '1',
-        ];
-        $document['dob'] = $data['date_of_birth'] ?? '';
-        $document['issue_date'] = $data['id_issue_at'] ?? '';
-        $document['expiry_date'] = $data['id_expired_at'] ?? '';
-        $document['document_number'] = $data['id_no'] ?? '';
-        $document['gender'] = ($data['gender']) ? substr(strtoupper($data['gender']), 0, 1) : 'M';
-        $document['age'] = [
-            'min' => '18',
-            'max' => '65',
-        ];
-
-        if (isset($data['photo'])) {
-            $face['proof'] = $data['photo'] ?? '';
-            $face['check_duplicate_request'] = '0';
-            $this->payload['face'] = $face;
-        }
-
-        $this->payload['document'] = $document;
-
-        return $this;
-    }
 }
