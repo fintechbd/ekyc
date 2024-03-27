@@ -61,7 +61,7 @@ class KycStatusService
      * @throws BindingResolutionException
      * @throws \ErrorException
      */
-    private function initVendor(string $vendor):KycVendor|\Fintech\Ekyc\Abstracts\KycVendor
+    private function initVendor(string $vendor): KycVendor|\Fintech\Ekyc\Abstracts\KycVendor
     {
         $driver = config("fintech.ekyc.providers.{$vendor}.driver");
 

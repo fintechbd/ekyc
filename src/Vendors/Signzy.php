@@ -3,7 +3,6 @@
 namespace Fintech\Ekyc\Vendors;
 
 use Fintech\Core\Enums\Ekyc\KycStatus;
-use Fintech\Core\Facades\Core;
 use Fintech\Ekyc\Abstracts\KycVendor as AbstractsKycVendor;
 use Fintech\Ekyc\Enums\KycAction;
 use Fintech\Ekyc\Interfaces\KycVendor;
@@ -11,7 +10,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 
-class Signzy  extends AbstractsKycVendor implements KycVendor
+class Signzy extends AbstractsKycVendor implements KycVendor
 {
     public $action;
 
@@ -29,7 +28,6 @@ class Signzy  extends AbstractsKycVendor implements KycVendor
     }
 
     /**
-     * @param string $reference
      * @return void
      */
     public function status(string $reference)
@@ -52,8 +50,6 @@ class Signzy  extends AbstractsKycVendor implements KycVendor
     }
 
     /**
-     * @param string $reference
-     * @param array $data
      * @return $this
      */
     public function address(string $reference, array $data = []): self
@@ -64,8 +60,6 @@ class Signzy  extends AbstractsKycVendor implements KycVendor
     }
 
     /**
-     * @param string $reference
-     * @param array $data
      * @return $this
      */
     public function identity(string $reference, array $data = []): self
@@ -188,5 +182,4 @@ class Signzy  extends AbstractsKycVendor implements KycVendor
             default => 'Documents are collected and request is pending for admin to review and Accept/Decline. Reference No: #'.$response['reference'],
         };
     }
-
 }
