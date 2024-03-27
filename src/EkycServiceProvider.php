@@ -24,22 +24,6 @@ class EkycServiceProvider extends ServiceProvider
         $this->app->register(RouteServiceProvider::class);
 
         $this->app->register(RepositoryServiceProvider::class);
-
-        $this->app->singleton(KycVendor::class, function (\Illuminate\Foundation\Application $app) {
-
-            $request = $app->make(KycVerificationRequest::class);
-
-            $vendor = $request->route('vendor', config('fintech.ekyc.default', 'manual'));
-
-            $driver = config("fintech.ekyc.providers.{$vendor}.driver");
-
-            if (! $driver) {
-                throw new \ErrorException("Missing driver for `{$vendor}` kyc provider.");
-            }
-
-            return $app->make($driver);
-
-        });
     }
 
     /**

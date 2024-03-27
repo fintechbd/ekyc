@@ -5,12 +5,12 @@ namespace Fintech\Ekyc\Services;
 use Fintech\Ekyc\Facades\Ekyc;
 use Fintech\Ekyc\Interfaces\KycStatusRepository;
 use Fintech\Ekyc\Interfaces\KycVendor;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Arr;
 
 /**
  * Class KycStatusService
  *
- * @property-read KycVendor $kycVendor
  * @property-read KycStatusRepository $kycStatusRepository
  */
 class KycStatusService
@@ -18,8 +18,7 @@ class KycStatusService
     /**
      * KycStatusService constructor.
      */
-    public function __construct(private readonly KycStatusRepository $kycStatusRepository,
-        private readonly KycVendor $kycVendor)
+    public function __construct(private readonly KycStatusRepository $kycStatusRepository)
     {
     }
 
@@ -37,6 +36,10 @@ class KycStatusService
         return $this->kycStatusRepository->create($inputs);
     }
 
+    /**
+     * @throws BindingResolutionException
+     * @throws \ErrorException
+     */
     public function verify(string $vendor, array $inputs = [])
     {
         $data['reference_no'] = Ekyc::getReferenceToken();
@@ -45,13 +48,28 @@ class KycStatusService
         $data['vendor'] = $vendor;
         $data['kyc_status_data'] = ['inputs' => $inputs];
 
-        $this->kycVendor->identity($data['reference_no'], $inputs)->verify();
+        $this->initVendor($vendor)->identity($data['reference_no'], $inputs)->verify();
         $data['request'] = Arr::wrap($this->kycVendor->getPayload());
         $data['response'] = Arr::wrap($this->kycVendor->getResponse());
         $data['status'] = $this->kycVendor->getStatus();
         $data['note'] = $this->kycVendor->getNote();
 
         return $this->create($data);
+    }
+
+    /**
+     * @throws BindingResolutionException
+     * @throws \ErrorException
+     */
+    private function initVendor(string $vendor):KycVendor|\Fintech\Ekyc\Abstracts\KycVendor
+    {
+        $driver = config("fintech.ekyc.providers.{$vendor}.driver");
+
+        if (! $driver) {
+            throw new \ErrorException("Missing driver for `{$vendor}` kyc provider.");
+        }
+
+        return app()->make($driver);
     }
 
     public function find($id, $onlyTrashed = false)
