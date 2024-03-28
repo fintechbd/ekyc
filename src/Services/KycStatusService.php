@@ -48,11 +48,12 @@ class KycStatusService
         $data['vendor'] = $vendor;
         $data['kyc_status_data'] = ['inputs' => $inputs];
 
-        $this->initVendor($vendor)->identity($data['reference_no'], $inputs)->verify();
-        $data['request'] = Arr::wrap($this->kycVendor->getPayload());
-        $data['response'] = Arr::wrap($this->kycVendor->getResponse());
-        $data['status'] = $this->kycVendor->getStatus();
-        $data['note'] = $this->kycVendor->getNote();
+        $kycVendor = $this->initVendor($vendor);
+        $kycVendor->identity($data['reference_no'], $inputs)->verify();
+        $data['request'] = Arr::wrap($kycVendor->getPayload());
+        $data['response'] = Arr::wrap($kycVendor->getResponse());
+        $data['status'] = $kycVendor->getStatus();
+        $data['note'] = $kycVendor->getNote();
 
         return $this->create($data);
     }
