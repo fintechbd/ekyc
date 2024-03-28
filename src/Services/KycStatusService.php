@@ -38,6 +38,7 @@ class KycStatusService
 
     /**
      * @return \Fintech\Core\Abstracts\BaseModel
+     *
      * @throws BindingResolutionException
      * @throws \ErrorException
      */
@@ -68,7 +69,7 @@ class KycStatusService
     {
         $driver = config("fintech.ekyc.providers.{$vendor}.driver");
 
-        if (!$driver) {
+        if (! $driver) {
             throw new \ErrorException("Missing driver for `{$vendor}` kyc provider.");
         }
 

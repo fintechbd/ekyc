@@ -4,27 +4,23 @@ namespace Fintech\Ekyc\Interfaces;
 
 interface KycVendor
 {
-//    /**
-//     * check a review status of a request document
-//     * on kyc vendor site
-//     *
-//     * @return mixed
-//     */
-//    public function status(string $reference);
+    //    /**
+    //     * check a review status of a request document
+    //     * on kyc vendor site
+    //     *
+    //     * @return mixed
+    //     */
+    //    public function status(string $reference);
 
     /**
      * Make a request with all document to verify on kyc system
-     *
-     * @param string $reference
-     * @param array $data
-     * @return void
      */
     public function verify(string $reference, array $data = []): void;
 
-//    /**
-//     * load the user that will go to kyc verification
-//     */
-//    public function address(string $reference, array $data = []): self;
+    //    /**
+    //     * load the user that will go to kyc verification
+    //     */
+    //    public function address(string $reference, array $data = []): self;
 
     public function getPayload(): mixed;
 

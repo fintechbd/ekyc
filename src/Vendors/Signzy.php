@@ -4,7 +4,6 @@ namespace Fintech\Ekyc\Vendors;
 
 use Fintech\Core\Enums\Ekyc\KycStatus;
 use Fintech\Ekyc\Abstracts\KycVendor as AbstractsKycVendor;
-use Fintech\Ekyc\Enums\KycAction;
 use Fintech\Ekyc\Interfaces\KycVendor;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
@@ -35,16 +34,11 @@ class Signzy extends AbstractsKycVendor implements KycVendor
         ]);
     }
 
-    /**
-     * @param string $reference
-     * @param array $data
-     * @return void
-     */
     public function verify(string $reference, array $data = []): void
     {
         $idType = \Fintech\MetaData\Facades\MetaData::idDocType()->find($data['id_doc_type_id']);
 
-        if (!$idType) {
+        if (! $idType) {
             throw (new ModelNotFoundException())->setModel(config('fintech.auth.id_doc_type_model', \Fintech\MetaData\Models\IdDocType::class), $data['id_doc_type_id']);
         }
 
@@ -84,13 +78,13 @@ class Signzy extends AbstractsKycVendor implements KycVendor
             'max' => '65',
         ];
 
-        if (!empty($data['photo'])) {
+        if (! empty($data['photo'])) {
             $face['proof'] = $data['photo'] ?? '';
             $face['check_duplicate_request'] = '0';
             $this->payload['face'] = $face;
         }
 
-        if (!empty($data['proof_of_address'])) {
+        if (! empty($data['proof_of_address'])) {
 
             $city = \Fintech\MetaData\Facades\MetaData::city()->find($data['present_city_id']);
 
@@ -108,7 +102,7 @@ class Signzy extends AbstractsKycVendor implements KycVendor
                 $full_address .= ", {$state->name}";
             }
 
-            if (!empty($data['present_post_code'])) {
+            if (! empty($data['present_post_code'])) {
                 $full_address .= ", {$data['present_post_code']}";
             }
 
@@ -117,7 +111,7 @@ class Signzy extends AbstractsKycVendor implements KycVendor
             }
 
             $address['proof'] = $data['proof_of_address'][''] ?? '';
-            $address['supported_types'] = ["any"];
+            $address['supported_types'] = ['any'];
             $address['full_address'] = $full_address;
             $address['address_fuzzy_match'] = '1';
             $address['backside_proof_required'] = '0';
@@ -135,7 +129,7 @@ class Signzy extends AbstractsKycVendor implements KycVendor
      */
     private function call(string $url = '/')
     {
-        if (!$this->config['username'] || !$this->config['password']) {
+        if (! $this->config['username'] || ! $this->config['password']) {
             throw new \InvalidArgumentException('Shufti Pro Client ID & Secret Key is missing.');
         }
 
@@ -187,7 +181,7 @@ class Signzy extends AbstractsKycVendor implements KycVendor
             'verification.declined' => $response['declined_reason'] ?? 'Request was valid and declined after verification.',
             'verification.accepted' => 'Document KYC Verification Completed.',
             'request.invalid' => $response['error']['message'] ?? 'The given data is invalid',
-            default => 'Documents are collected and request is pending for admin to review and Accept/Decline. Reference No: #' . $response['reference'],
+            default => 'Documents are collected and request is pending for admin to review and Accept/Decline. Reference No: #'.$response['reference'],
         };
     }
 }
