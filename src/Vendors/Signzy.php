@@ -12,8 +12,6 @@ use Illuminate\Support\Facades\Http;
 
 class Signzy extends AbstractsKycVendor implements KycVendor
 {
-    public $action;
-
     public function __construct()
     {
         $mode = config('fintech.ekyc.providers.shufti_pro.mode', 'sandbox');
@@ -32,43 +30,21 @@ class Signzy extends AbstractsKycVendor implements KycVendor
      */
     public function status(string $reference)
     {
-        $this->action = KycAction::StatusCheck;
-
         $this->call('/status', [
             'reference' => $reference,
         ]);
     }
 
     /**
+     * @param string $reference
+     * @param array $data
      * @return void
      */
-    public function verify()
+    public function verify(string $reference, array $data = []): void
     {
-        $this->action = KycAction::Verification;
-
-        $this->call('/');
-    }
-
-    /**
-     * @return $this
-     */
-    public function address(string $reference, array $data = []): self
-    {
-        $this->type = 'address';
-
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function identity(string $reference, array $data = []): self
-    {
-        $this->type = 'identity';
-
         $idType = \Fintech\MetaData\Facades\MetaData::idDocType()->find($data['id_doc_type_id']);
 
-        if (! $idType) {
+        if (!$idType) {
             throw (new ModelNotFoundException())->setModel(config('fintech.auth.id_doc_type_model', \Fintech\MetaData\Models\IdDocType::class), $data['id_doc_type_id']);
         }
 
@@ -108,15 +84,50 @@ class Signzy extends AbstractsKycVendor implements KycVendor
             'max' => '65',
         ];
 
-        if (isset($data['photo'])) {
+        if (!empty($data['photo'])) {
             $face['proof'] = $data['photo'] ?? '';
             $face['check_duplicate_request'] = '0';
             $this->payload['face'] = $face;
         }
 
+        if (!empty($data['proof_of_address'])) {
+
+            $city = \Fintech\MetaData\Facades\MetaData::city()->find($data['present_city_id']);
+
+            $state = \Fintech\MetaData\Facades\MetaData::state()->find($data['present_state_id']);
+
+            $country = \Fintech\MetaData\Facades\MetaData::country()->find($data['present_country_id']);
+
+            $full_address = $data['present_address'];
+
+            if ($city) {
+                $full_address .= ", {$city->name}";
+            }
+
+            if ($state) {
+                $full_address .= ", {$state->name}";
+            }
+
+            if (!empty($data['present_post_code'])) {
+                $full_address .= ", {$data['present_post_code']}";
+            }
+
+            if ($country) {
+                $full_address .= ", {$country->name}.";
+            }
+
+            $address['proof'] = $data['proof_of_address'][''] ?? '';
+            $address['supported_types'] = ["any"];
+            $address['full_address'] = $full_address;
+            $address['address_fuzzy_match'] = '1';
+            $address['backside_proof_required'] = '0';
+            $address['verification_mode'] = 'any';
+            $this->payload['address'] = $address;
+        }
+
         $this->payload['document'] = $document;
 
-        return $this;
+        $this->call('/');
     }
 
     /**
@@ -124,7 +135,7 @@ class Signzy extends AbstractsKycVendor implements KycVendor
      */
     private function call(string $url = '/')
     {
-        if (! $this->config['username'] || ! $this->config['password']) {
+        if (!$this->config['username'] || !$this->config['password']) {
             throw new \InvalidArgumentException('Shufti Pro Client ID & Secret Key is missing.');
         }
 
@@ -138,8 +149,6 @@ class Signzy extends AbstractsKycVendor implements KycVendor
 
         $this->response = $response->json();
 
-        logger('Shufti Pro Response', [$response->status(), $response->json()]);
-
         $this->validateResponse($response);
     }
 
@@ -148,8 +157,7 @@ class Signzy extends AbstractsKycVendor implements KycVendor
         $this->status = KycStatus::Pending->value;
 
         $this->note = match ($response->status()) {
-            200 => $this->eventStatusHandler($response->json()),
-            400 => 'Bad Request: one or more parameter is invalid or missing',
+            200, 400 => $this->eventStatusHandler($response->json()),//'Bad Request: one or more parameter is invalid or missing',
             401 => 'Unauthorized: invalid signature key provided in the request',
             402 => 'Request Failed: invalid request data: missing required parameters',
             403 => 'Forbidden: service not allowed',
@@ -179,7 +187,7 @@ class Signzy extends AbstractsKycVendor implements KycVendor
             'verification.declined' => $response['declined_reason'] ?? 'Request was valid and declined after verification.',
             'verification.accepted' => 'Document KYC Verification Completed.',
             'request.invalid' => $response['error']['message'] ?? 'The given data is invalid',
-            default => 'Documents are collected and request is pending for admin to review and Accept/Decline. Reference No: #'.$response['reference'],
+            default => 'Documents are collected and request is pending for admin to review and Accept/Decline. Reference No: #' . $response['reference'],
         };
     }
 }

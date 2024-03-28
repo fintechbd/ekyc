@@ -37,6 +37,7 @@ class KycStatusService
     }
 
     /**
+     * @return \Fintech\Core\Abstracts\BaseModel
      * @throws BindingResolutionException
      * @throws \ErrorException
      */
@@ -49,7 +50,8 @@ class KycStatusService
         $data['kyc_status_data'] = ['inputs' => $inputs];
 
         $kycVendor = $this->initVendor($vendor);
-        $kycVendor->identity($data['reference_no'], $inputs)->verify();
+        $kycVendor->verify($data['reference_no'], $inputs);
+
         $data['request'] = Arr::wrap($kycVendor->getPayload());
         $data['response'] = Arr::wrap($kycVendor->getResponse());
         $data['status'] = $kycVendor->getStatus();
@@ -66,7 +68,7 @@ class KycStatusService
     {
         $driver = config("fintech.ekyc.providers.{$vendor}.driver");
 
-        if (! $driver) {
+        if (!$driver) {
             throw new \ErrorException("Missing driver for `{$vendor}` kyc provider.");
         }
 
