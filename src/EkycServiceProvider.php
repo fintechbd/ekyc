@@ -4,8 +4,6 @@ namespace Fintech\Ekyc;
 
 use Fintech\Ekyc\Commands\EkycCommand;
 use Fintech\Ekyc\Commands\InstallCommand;
-use Fintech\Ekyc\Http\Requests\KycVerificationRequest;
-use Fintech\Ekyc\Interfaces\KycVendor;
 use Illuminate\Support\ServiceProvider;
 
 class EkycServiceProvider extends ServiceProvider
