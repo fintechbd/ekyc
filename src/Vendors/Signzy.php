@@ -11,13 +11,14 @@ use Illuminate\Support\Facades\Http;
 
 class Signzy extends AbstractsKycVendor implements KycVendor
 {
-    private string $token;
+    private string $accessToken;
+    private string $patronId;
 
     public function __construct()
     {
-        $mode = config('fintech.ekyc.providers.signzy.mode', 'sandbox');
+        $this->mode = config('fintech.ekyc.providers.signzy.mode', 'sandbox');
 
-        $this->config = config("fintech.ekyc.providers.signzy.{$mode}", [
+        $this->config = config("fintech.ekyc.providers.signzy.{$this->mode}", [
             'endpoint' => 'https://preproduction.signzy.tech/api/v2/patrons',
             'username' => null,
             'password' => null,
@@ -40,7 +41,7 @@ class Signzy extends AbstractsKycVendor implements KycVendor
     {
         $idType = \Fintech\MetaData\Facades\MetaData::idDocType()->find($data['id_doc_type_id']);
 
-        if (! $idType) {
+        if (!$idType) {
             throw (new ModelNotFoundException())->setModel(config('fintech.auth.id_doc_type_model', \Fintech\MetaData\Models\IdDocType::class), $data['id_doc_type_id']);
         }
 
@@ -80,13 +81,13 @@ class Signzy extends AbstractsKycVendor implements KycVendor
             'max' => '65',
         ];
 
-        if (! empty($data['photo'])) {
+        if (!empty($data['photo'])) {
             $face['proof'] = $data['photo'] ?? '';
             $face['check_duplicate_request'] = '0';
             $this->payload['face'] = $face;
         }
 
-        if (! empty($data['proof_of_address'])) {
+        if (!empty($data['proof_of_address'])) {
 
             $city = \Fintech\MetaData\Facades\MetaData::city()->find($data['present_city_id']);
 
@@ -104,7 +105,7 @@ class Signzy extends AbstractsKycVendor implements KycVendor
                 $full_address .= ", {$state->name}";
             }
 
-            if (! empty($data['present_post_code'])) {
+            if (!empty($data['present_post_code'])) {
                 $full_address .= ", {$data['present_post_code']}";
             }
 
@@ -139,18 +140,17 @@ class Signzy extends AbstractsKycVendor implements KycVendor
                 'password' => $this->config['password'],
             ]);
     }
+
     private function logout()
     {
-        $response = Http::withoutVerifying()->timeout(30)
+        Http::withoutVerifying()->timeout(30)
             ->baseUrl($this->config['endpoint'])
             ->withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
             ])
-            ->post('/logout', [
-                'username' => $this->config['username'],
-                'password' => $this->config['password'],
-            ]);
+            ->post('/logout', ['access_token' => $this->accessToken]);
+
     }
 
     /**
@@ -158,9 +158,12 @@ class Signzy extends AbstractsKycVendor implements KycVendor
      */
     private function call(string $url = '/')
     {
-        if (! $this->config['username'] || ! $this->config['password']) {
+        if (!$this->config['username'] || !$this->config['password']) {
             throw new \InvalidArgumentException('Signzy Username or Password is missing.');
         }
+
+        //pre-request token generate
+        $this->login();
 
         $response = Http::withoutVerifying()->timeout(120)
             ->baseUrl($this->config['endpoint'])
@@ -168,10 +171,12 @@ class Signzy extends AbstractsKycVendor implements KycVendor
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
             ])->post($url, $this->payload);
-
         $this->response = $response->json();
 
         $this->validateResponse($response);
+
+        //post-request token destroy
+        $this->logout();
     }
 
     private function validateResponse(\Illuminate\Http\Client\Response $response): void
@@ -209,7 +214,15 @@ class Signzy extends AbstractsKycVendor implements KycVendor
             'verification.declined' => $response['declined_reason'] ?? 'Request was valid and declined after verification.',
             'verification.accepted' => 'Document KYC Verification Completed.',
             'request.invalid' => $response['error']['message'] ?? 'The given data is invalid',
-            default => 'Documents are collected and request is pending for admin to review and Accept/Decline. Reference No: #'.$response['reference'],
+            default => 'Documents are collected and request is pending for admin to review and Accept/Decline. Reference No: #' . $response['reference'],
         };
+    }
+
+    /**
+     * update the current credentials
+     */
+    public function syncCredential(): bool
+    {
+
     }
 }

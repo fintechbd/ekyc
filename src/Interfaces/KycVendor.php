@@ -17,10 +17,10 @@ interface KycVendor
      */
     public function verify(string $reference, array $data = []): void;
 
-    //    /**
-    //     * load the user that will go to kyc verification
-    //     */
-    //    public function address(string $reference, array $data = []): self;
+    /**
+     * update the current credentials
+     */
+    public function syncCredential(): bool;
 
     public function getPayload(): mixed;
 

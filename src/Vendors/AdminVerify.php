@@ -2,14 +2,13 @@
 
 namespace Fintech\Ekyc\Vendors;
 
+use Fintech\Ekyc\Abstracts\KycVendor as AbstractsKycVendor;
 use Fintech\Ekyc\Interfaces\KycVendor;
 use Illuminate\Support\Facades\Http;
 
-class AdminVerify implements KycVendor
+class AdminVerify extends AbstractsKycVendor implements KycVendor
 {
     public $config;
-
-    public $mode;
 
     public function __construct()
     {
@@ -39,7 +38,7 @@ class AdminVerify implements KycVendor
 
     }
 
-    public function verify(array $data = [])
+    public function verify(string $reference, array $data = []): void
     {
 
     }
@@ -47,5 +46,13 @@ class AdminVerify implements KycVendor
     public function delete(array $reference = [])
     {
 
+    }
+
+    /**
+     * update the current credentials
+     */
+    public function syncCredential(): bool
+    {
+        // TODO: Implement syncCredential() method.
     }
 }

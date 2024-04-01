@@ -14,6 +14,8 @@ class KycVendor
 
     protected string $status;
 
+    protected string $mode;
+
     public function getPayload(): mixed
     {
         return $this->payload;

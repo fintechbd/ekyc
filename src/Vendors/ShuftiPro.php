@@ -13,9 +13,9 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
 {
     public function __construct()
     {
-        $mode = config('fintech.ekyc.providers.shufti_pro.mode', 'sandbox');
+        $this->mode = config('fintech.ekyc.providers.shufti_pro.mode', 'sandbox');
 
-        $this->config = config("fintech.ekyc.providers.shufti_pro.{$mode}", [
+        $this->config = config("fintech.ekyc.providers.shufti_pro.{$this->mode}", [
             'endpoint' => 'https://api.shuftipro.com',
             'username' => null,
             'password' => null,
@@ -183,5 +183,13 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
             'request.invalid' => $response['error']['message'] ?? 'The given data is invalid',
             default => 'Documents are collected and request is pending for admin to review and Accept/Decline. Reference No: #'.$response['reference'],
         };
+    }
+
+    /**
+     * update the current credentials
+     */
+    public function syncCredential(): bool
+    {
+        // TODO: Implement syncCredential() method.
     }
 }
