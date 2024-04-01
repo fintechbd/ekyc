@@ -11,17 +11,19 @@ use Illuminate\Support\Facades\Http;
 
 class Signzy extends AbstractsKycVendor implements KycVendor
 {
+    private string $token;
+
     public function __construct()
     {
-        $mode = config('fintech.ekyc.providers.shufti_pro.mode', 'sandbox');
+        $mode = config('fintech.ekyc.providers.signzy.mode', 'sandbox');
 
-        $this->config = config("fintech.ekyc.providers.shufti_pro.{$mode}", [
-            'endpoint' => 'https://api.shuftipro.com',
+        $this->config = config("fintech.ekyc.providers.signzy.{$mode}", [
+            'endpoint' => 'https://preproduction.signzy.tech/api/v2/patrons',
             'username' => null,
             'password' => null,
         ]);
 
-        $this->payload = config('fintech.ekyc.providers.shufti_pro.options');
+//        $this->payload = config('fintech.ekyc.providers.signzy.options');
     }
 
     /**
@@ -124,17 +126,43 @@ class Signzy extends AbstractsKycVendor implements KycVendor
         $this->call('/');
     }
 
+    private function login()
+    {
+        $response = Http::withoutVerifying()->timeout(30)
+            ->baseUrl($this->config['endpoint'])
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])
+            ->post('/login', [
+                'username' => $this->config['username'],
+                'password' => $this->config['password'],
+            ]);
+    }
+    private function logout()
+    {
+        $response = Http::withoutVerifying()->timeout(30)
+            ->baseUrl($this->config['endpoint'])
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])
+            ->post('/logout', [
+                'username' => $this->config['username'],
+                'password' => $this->config['password'],
+            ]);
+    }
+
     /**
      * @return void
      */
     private function call(string $url = '/')
     {
         if (! $this->config['username'] || ! $this->config['password']) {
-            throw new \InvalidArgumentException('Shufti Pro Client ID & Secret Key is missing.');
+            throw new \InvalidArgumentException('Signzy Username or Password is missing.');
         }
 
         $response = Http::withoutVerifying()->timeout(120)
-            ->withBasicAuth($this->config['username'], $this->config['password'])
             ->baseUrl($this->config['endpoint'])
             ->withHeaders([
                 'Content-Type' => 'application/json',
