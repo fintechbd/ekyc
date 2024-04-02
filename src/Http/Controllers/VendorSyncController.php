@@ -4,7 +4,6 @@ namespace Fintech\Ekyc\Http\Controllers;
 
 use Exception;
 use Fintech\Core\Traits\ApiResponseTrait;
-use Fintech\Ekyc\Interfaces\KycVendor;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 
@@ -15,7 +14,7 @@ class VendorSyncController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(string $vendor = null): JsonResponse
+    public function __invoke(?string $vendor = null): JsonResponse
     {
         try {
 
@@ -27,7 +26,7 @@ class VendorSyncController extends Controller
             /**
              * @var \Fintech\Ekyc\Interfaces\KycVendor $instance
              */
-            $instance =  app()->make($driver);
+            $instance = app()->make($driver);
 
             $response = $instance->syncCredential();
 
