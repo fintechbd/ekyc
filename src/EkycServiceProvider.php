@@ -2,12 +2,15 @@
 
 namespace Fintech\Ekyc;
 
+use Fintech\Core\Traits\RegisterPackageTrait;
 use Fintech\Ekyc\Commands\EkycCommand;
 use Fintech\Ekyc\Commands\InstallCommand;
 use Illuminate\Support\ServiceProvider;
 
 class EkycServiceProvider extends ServiceProvider
 {
+    use RegisterPackageTrait;
+
     /**
      * Register any application services.
      *
@@ -15,6 +18,8 @@ class EkycServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->packageCode = 'ekyc';
+
         $this->mergeConfigFrom(
             __DIR__.'/../config/ekyc.php', 'fintech.ekyc'
         );
@@ -29,6 +34,8 @@ class EkycServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->injectOnConfig();
+
         $this->publishes([
             __DIR__.'/../config/ekyc.php' => config_path('fintech/ekyc.php'),
         ]);
