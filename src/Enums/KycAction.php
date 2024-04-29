@@ -2,11 +2,11 @@
 
 namespace Fintech\Ekyc\Enums;
 
-use Fintech\Core\Traits\HasSerialization;
+use Fintech\Core\Traits\EnumHasSerialization;
 
 enum KycAction: string
 {
-    use HasSerialization;
+    use EnumHasSerialization;
 
     case Verification = 'verify';
     case StatusCheck = 'status';
