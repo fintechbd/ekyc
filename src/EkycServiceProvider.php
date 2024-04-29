@@ -24,9 +24,8 @@ class EkycServiceProvider extends ServiceProvider
             __DIR__.'/../config/ekyc.php', 'fintech.ekyc'
         );
 
-        $this->app->register(RouteServiceProvider::class);
-
-        $this->app->register(RepositoryServiceProvider::class);
+        $this->app->register(\Fintech\Ekyc\Providers\RouteServiceProvider::class);
+        $this->app->register(\Fintech\Ekyc\Providers\RepositoryServiceProvider::class);
     }
 
     /**

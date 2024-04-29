@@ -1,6 +1,6 @@
 <?php
 
-namespace Fintech\Ekyc;
+namespace Fintech\Ekyc\Providers;
 
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\Facades\Config;
