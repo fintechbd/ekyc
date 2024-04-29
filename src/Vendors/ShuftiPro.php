@@ -38,13 +38,13 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
     {
         $idType = \Fintech\MetaData\Facades\MetaData::idDocType()->find($data['id_doc_type_id']);
 
-        if (!$idType) {
+        if (! $idType) {
             throw (new ModelNotFoundException())->setModel(config('fintech.metadata.catalog_model', \Fintech\MetaData\Models\Catalog::class), $data['id_doc_type_id']);
         }
 
         $country = $idType->countries->firstWhere('name', $data['id_issue_country']);
 
-        if (!$country) {
+        if (! $country) {
             throw (new ModelNotFoundException())->setModel(config('fintech.metadata.country_model', \Fintech\MetaData\Models\Country::class), $data['id_issue_country']);
         }
 
@@ -82,13 +82,13 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
             'max' => '65',
         ];
 
-        if (!empty($data['photo'])) {
+        if (! empty($data['photo'])) {
             $face['proof'] = $data['photo'] ?? '';
             $face['check_duplicate_request'] = '0';
             $this->payload['face'] = $face;
         }
 
-        if (!empty($data['proof_of_address'])) {
+        if (! empty($data['proof_of_address'])) {
 
             $city = \Fintech\MetaData\Facades\MetaData::city()->find($data['present_city_id']);
 
@@ -106,7 +106,7 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
                 $full_address .= ", {$state->name}";
             }
 
-            if (!empty($data['present_post_code'])) {
+            if (! empty($data['present_post_code'])) {
                 $full_address .= ", {$data['present_post_code']}";
             }
 
@@ -133,7 +133,7 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
      */
     private function call(string $url = '/')
     {
-        if (!$this->config['client_id'] || !$this->config['secret_key']) {
+        if (! $this->config['client_id'] || ! $this->config['secret_key']) {
             throw new \InvalidArgumentException('Shufti Pro Client ID & Secret Key is missing.');
         }
 
@@ -185,7 +185,7 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
             'verification.declined' => $response['declined_reason'] ?? 'Request was valid and declined after verification.',
             'verification.accepted' => 'Document KYC Verification Completed.',
             'request.invalid' => $response['error']['message'] ?? 'The given data is invalid',
-            default => 'Documents are collected and request is pending for admin to review and Accept/Decline. Reference No: #' . $response['reference'],
+            default => 'Documents are collected and request is pending for admin to review and Accept/Decline. Reference No: #'.$response['reference'],
         };
     }
 
