@@ -17,8 +17,8 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
 
         $this->config = config("fintech.ekyc.providers.shufti_pro.{$this->mode}", [
             'endpoint' => 'https://api.shuftipro.com',
-            'username' => null,
-            'password' => null,
+            'client_id' => null,
+            'secret_key' => null,
         ]);
 
         $this->payload = config('fintech.ekyc.providers.shufti_pro.options');
@@ -38,13 +38,17 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
     {
         $idType = \Fintech\MetaData\Facades\MetaData::idDocType()->find($data['id_doc_type_id']);
 
-        if (! $idType) {
-            throw (new ModelNotFoundException())->setModel(config('fintech.auth.id_doc_type_model', \Fintech\MetaData\Models\IdDocType::class), $data['id_doc_type_id']);
+        if (!$idType) {
+            throw (new ModelNotFoundException())->setModel(config('fintech.metadata.catalog_model', \Fintech\MetaData\Models\Catalog::class), $data['id_doc_type_id']);
         }
 
-        $idType->load('country');
+        $country = $idType->countries->firstWhere('name', $data['id_issue_country']);
 
-        $this->payload['country'] = strtoupper($idType->country->iso2);
+        if (!$country) {
+            throw (new ModelNotFoundException())->setModel(config('fintech.metadata.country_model', \Fintech\MetaData\Models\Country::class), $data['id_issue_country']);
+        }
+
+        $this->payload['country'] = strtoupper($country->iso2);
         $this->payload['reference'] = $reference;
         $this->payload['callback_url'] = route('ekyc.kyc.status-change-callback');
         $this->payload['email'] = $data['email'] ?? '';
@@ -78,13 +82,13 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
             'max' => '65',
         ];
 
-        if (! empty($data['photo'])) {
+        if (!empty($data['photo'])) {
             $face['proof'] = $data['photo'] ?? '';
             $face['check_duplicate_request'] = '0';
             $this->payload['face'] = $face;
         }
 
-        if (! empty($data['proof_of_address'])) {
+        if (!empty($data['proof_of_address'])) {
 
             $city = \Fintech\MetaData\Facades\MetaData::city()->find($data['present_city_id']);
 
@@ -102,7 +106,7 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
                 $full_address .= ", {$state->name}";
             }
 
-            if (! empty($data['present_post_code'])) {
+            if (!empty($data['present_post_code'])) {
                 $full_address .= ", {$data['present_post_code']}";
             }
 
@@ -129,12 +133,12 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
      */
     private function call(string $url = '/')
     {
-        if (! $this->config['username'] || ! $this->config['password']) {
+        if (!$this->config['client_id'] || !$this->config['secret_key']) {
             throw new \InvalidArgumentException('Shufti Pro Client ID & Secret Key is missing.');
         }
 
         $response = Http::withoutVerifying()->timeout(120)
-            ->withBasicAuth($this->config['username'], $this->config['password'])
+            ->withBasicAuth($this->config['client_id'], $this->config['secret_key'])
             ->baseUrl($this->config['endpoint'])
             ->withHeaders([
                 'Content-Type' => 'application/json',
@@ -181,7 +185,7 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
             'verification.declined' => $response['declined_reason'] ?? 'Request was valid and declined after verification.',
             'verification.accepted' => 'Document KYC Verification Completed.',
             'request.invalid' => $response['error']['message'] ?? 'The given data is invalid',
-            default => 'Documents are collected and request is pending for admin to review and Accept/Decline. Reference No: #'.$response['reference'],
+            default => 'Documents are collected and request is pending for admin to review and Accept/Decline. Reference No: #' . $response['reference'],
         };
     }
 
