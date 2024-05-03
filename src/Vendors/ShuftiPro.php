@@ -52,8 +52,7 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
         $this->payload['reference'] = $reference;
         $this->payload['callback_url'] = route('ekyc.kyc.status-change-callback');
         $this->payload['email'] = $data['email'] ?? '';
-
-        $document['supported_types'] = Arr::wrap($idType->id_doc_type_data['shuftipro_document_type'] ?? 'any');
+        $document['supported_types'] = Arr::wrap($idType->vendor_code['ekyc']['shufti_pro'] ?? 'any');
         $document['proof'] = $data['documents'][0]['front'] ?? '';
         $document['additional_proof'] = $data['documents'][1]['back'] ?? '';
         $document['backside_proof_required'] = ($idType->sides == 1) ? '0' : '1';
@@ -68,60 +67,60 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
         ];
         $document['verification_mode'] = 'image_only';
         $document['fetch_enhanced_data'] = '1';
-        $document['name'] = [
-            'full_name' => $data['name'] ?? '',
-            'fuzzy_match' => '1',
-        ];
-        $document['dob'] = $data['date_of_birth'] ?? '';
-        $document['issue_date'] = $data['id_issue_at'] ?? '';
-        $document['expiry_date'] = $data['id_expired_at'] ?? '';
-        $document['document_number'] = $data['id_no'] ?? '';
-        $document['gender'] = ($data['gender']) ? substr(strtoupper($data['gender']), 0, 1) : 'M';
-        $document['age'] = [
-            'min' => '18',
-            'max' => '65',
-        ];
+//        $document['name'] = [
+//            'full_name' => $data['name'] ?? '',
+//            'fuzzy_match' => '1',
+//        ];
+//        $document['dob'] = $data['date_of_birth'] ?? '';
+//        $document['issue_date'] = $data['id_issue_at'] ?? '';
+//        $document['expiry_date'] = $data['id_expired_at'] ?? '';
+//        $document['document_number'] = $data['id_no'] ?? '';
+//        $document['gender'] = ($data['gender']) ? substr(strtoupper($data['gender']), 0, 1) : 'M';
+//        $document['age'] = [
+//            'min' => '18',
+//            'max' => '65',
+//        ];
 
-        if (! empty($data['photo'])) {
-            $face['proof'] = $data['photo'] ?? '';
-            $face['check_duplicate_request'] = '0';
-            $this->payload['face'] = $face;
-        }
-
-        if (! empty($data['proof_of_address'])) {
-
-            $city = \Fintech\MetaData\Facades\MetaData::city()->find($data['present_city_id']);
-
-            $state = \Fintech\MetaData\Facades\MetaData::state()->find($data['present_state_id']);
-
-            $country = \Fintech\MetaData\Facades\MetaData::country()->find($data['present_country_id']);
-
-            $full_address = $data['present_address'];
-
-            if ($city) {
-                $full_address .= ", {$city->name}";
-            }
-
-            if ($state) {
-                $full_address .= ", {$state->name}";
-            }
-
-            if (! empty($data['present_post_code'])) {
-                $full_address .= ", {$data['present_post_code']}";
-            }
-
-            if ($country) {
-                $full_address .= ", {$country->name}.";
-            }
-
-            $address['proof'] = $data['proof_of_address'][''] ?? '';
-            $address['supported_types'] = ['any'];
-            $address['full_address'] = $full_address;
-            $address['address_fuzzy_match'] = '1';
-            $address['backside_proof_required'] = '0';
-            $address['verification_mode'] = 'any';
-            $this->payload['address'] = $address;
-        }
+//        if (! empty($data['photo'])) {
+//            $face['proof'] = $data['photo'] ?? '';
+//            $face['check_duplicate_request'] = '0';
+//            $this->payload['face'] = $face;
+//        }
+//
+//        if (! empty($data['proof_of_address'])) {
+//
+//            $city = \Fintech\MetaData\Facades\MetaData::city()->find($data['present_city_id']);
+//
+//            $state = \Fintech\MetaData\Facades\MetaData::state()->find($data['present_state_id']);
+//
+//            $country = \Fintech\MetaData\Facades\MetaData::country()->find($data['present_country_id']);
+//
+//            $full_address = $data['present_address'];
+//
+//            if ($city) {
+//                $full_address .= ", {$city->name}";
+//            }
+//
+//            if ($state) {
+//                $full_address .= ", {$state->name}";
+//            }
+//
+//            if (! empty($data['present_post_code'])) {
+//                $full_address .= ", {$data['present_post_code']}";
+//            }
+//
+//            if ($country) {
+//                $full_address .= ", {$country->name}.";
+//            }
+//
+//            $address['proof'] = $data['proof_of_address'][''] ?? '';
+//            $address['supported_types'] = ['any'];
+//            $address['full_address'] = $full_address;
+//            $address['address_fuzzy_match'] = '1';
+//            $address['backside_proof_required'] = '0';
+//            $address['verification_mode'] = 'any';
+//            $this->payload['address'] = $address;
+//        }
 
         $this->payload['document'] = $document;
 
