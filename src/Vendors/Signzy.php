@@ -91,7 +91,7 @@ class Signzy extends AbstractsKycVendor implements KycVendor
         }
 
         $this->payload['essentials']['country'] = $data['id_issue_country'];
-        $this->payload['essentials']['idType'] = $idType->vendor_code['ekyc']['signzy'] ?? 'other';
+        $this->payload['essentials']['idType'] = $idType->vendor_code['ekyc']['signzy'] ?? 'Other Id Card';
         $this->payload['essentials']['performImageQualityAnalysis'] = false;
         $this->payload['essentials']['performIdClassification'] = true;
         $this->payload['essentials']['performIdExtraction'] = true;
@@ -186,6 +186,7 @@ class Signzy extends AbstractsKycVendor implements KycVendor
             403 => 'Forbidden: service not allowed',
             404 => 'Not Found: Resource not found',
             409 => 'Conflict: Conflicting data: already exists',
+            422 => 'Missing Inputs or the JSON body of a request is badly-formed.',
             429 => 'Too Many Attempts.',
             500 => 'Internal Server Error',
             504 => 'Server error',
