@@ -90,15 +90,20 @@ return [
             'countries' => [231],
             'live' => [
                 'endpoint' => 'https://signzy.tech/api/v2/patrons',
-                'access_token' => env('PACKAGE_EKYC_SIGNZY_USERNAME', null),
+                'username' => env('PACKAGE_EKYC_SIGNZY_USERNAME', null),
                 'password' => env('PACKAGE_EKYC_SIGNZY_PASSWORD', null),
             ],
             'sandbox' => [
                 'endpoint' => 'https://preproduction.signzy.tech/api/v2/patrons',
-                'access_token' => env('PACKAGE_EKYC_SIGNZY_USERNAME', null),
+                'username' => env('PACKAGE_EKYC_SIGNZY_USERNAME', null),
                 'password' => env('PACKAGE_EKYC_SIGNZY_PASSWORD', null),
             ],
-            'options' => [],
+            'options' => [
+                'last_requested_at' => null,
+                'timeout' => null,
+                'access_token' => null,
+                'patron_id' => null
+            ],
         ],
     ],
 

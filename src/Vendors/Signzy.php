@@ -14,6 +14,10 @@ class Signzy extends AbstractsKycVendor implements KycVendor
     private string $accessToken;
 
     private string $patronId;
+    /**
+     * @var mixed
+     */
+    private mixed $options;
 
     public function __construct()
     {
@@ -25,7 +29,7 @@ class Signzy extends AbstractsKycVendor implements KycVendor
             'password' => null,
         ]);
 
-        //        $this->payload = config('fintech.ekyc.providers.signzy.options');
+        $this->options = config('fintech.ekyc.providers.signzy.options');
     }
 
     /**
@@ -140,6 +144,8 @@ class Signzy extends AbstractsKycVendor implements KycVendor
                 'username' => $this->config['username'],
                 'password' => $this->config['password'],
             ]);
+
+        dd($response->body());
     }
 
     private function logout()
