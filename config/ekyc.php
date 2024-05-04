@@ -102,7 +102,7 @@ return [
                 'last_requested_at' => null,
                 'timeout' => null,
                 'access_token' => null,
-                'patron_id' => null
+                'patron_id' => null,
             ],
         ],
     ],
