@@ -14,9 +14,7 @@ class Signzy extends AbstractsKycVendor implements KycVendor
     private string $accessToken;
 
     private string $patronId;
-    /**
-     * @var mixed
-     */
+
     private mixed $options;
 
     public function __construct()
