@@ -57,7 +57,8 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
         if (!empty($data['documents'][1]['back'])) {
             $document['additional_proof'] = $data['documents'][1]['back'];
         }
-        $document['backside_proof_required'] = ($idType->sides == 1) ? '0' : '1';
+        //$document['backside_proof_required'] = ($idType->sides == 1) ? '0' : '1';
+        $document['backside_proof_required'] = '1';
         $document['allow_ekyc'] = '0';
         $document['verification_instructions'] = [
             'allow_paper_based' => '1',
