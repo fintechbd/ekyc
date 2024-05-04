@@ -38,13 +38,13 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
     {
         $idType = \Fintech\MetaData\Facades\MetaData::idDocType()->find($data['id_doc_type_id']);
 
-        if (! $idType) {
+        if (!$idType) {
             throw (new ModelNotFoundException())->setModel(config('fintech.metadata.catalog_model', \Fintech\MetaData\Models\Catalog::class), $data['id_doc_type_id']);
         }
 
         $country = $idType->countries->firstWhere('name', $data['id_issue_country']);
 
-        if (! $country) {
+        if (!$country) {
             throw (new ModelNotFoundException())->setModel(config('fintech.metadata.country_model', \Fintech\MetaData\Models\Country::class), $data['id_issue_country']);
         }
 
@@ -54,7 +54,9 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
         $this->payload['email'] = $data['email'] ?? '';
         $document['supported_types'] = Arr::wrap($idType->vendor_code['ekyc']['shufti_pro'] ?? 'any');
         $document['proof'] = $data['documents'][0]['front'] ?? '';
-        $document['additional_proof'] = $data['documents'][1]['back'] ?? '';
+        if (!empty($data['documents'][1]['back'])) {
+            $document['additional_proof'] = $data['documents'][1]['back'];
+        }
         $document['backside_proof_required'] = ($idType->sides == 1) ? '0' : '1';
         $document['allow_ekyc'] = '0';
         $document['verification_instructions'] = [
@@ -132,7 +134,7 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
      */
     private function call(string $url = '/')
     {
-        if (! $this->config['client_id'] || ! $this->config['secret_key']) {
+        if (!$this->config['client_id'] || !$this->config['secret_key']) {
             throw new \InvalidArgumentException('Shufti Pro Client ID & Secret Key is missing.');
         }
 
@@ -184,7 +186,7 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
             'verification.declined' => $response['declined_reason'] ?? 'Request was valid and declined after verification.',
             'verification.accepted' => 'Document KYC Verification Completed.',
             'request.invalid' => $response['error']['message'] ?? 'The given data is invalid',
-            default => 'Documents are collected and request is pending for admin to review and Accept/Decline. Reference No: #'.$response['reference'],
+            default => 'Documents are collected and request is pending for admin to review and Accept/Decline. Reference No: #' . $response['reference'],
         };
     }
 
