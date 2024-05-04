@@ -56,7 +56,7 @@ class Signzy extends AbstractsKycVendor implements KycVendor
     {
         $idType = \Fintech\MetaData\Facades\MetaData::idDocType()->find($data['id_doc_type_id']);
 
-        if (!$idType) {
+        if (! $idType) {
             throw (new ModelNotFoundException())->setModel(config('fintech.metadata.catalog_model', \Fintech\MetaData\Models\Catalog::class), $data['id_doc_type_id']);
         }
 
@@ -97,7 +97,6 @@ class Signzy extends AbstractsKycVendor implements KycVendor
         $this->payload['essentials']['performIdExtraction'] = true;
         $this->payload['essentials']['performFaceExtraction'] = false;
         $this->payload['essentials']['imageQualityThreshold'] = 0.5;
-
 
         $this->call("/{$this->patronId}/documentIntelligence");
     }
@@ -146,13 +145,9 @@ class Signzy extends AbstractsKycVendor implements KycVendor
 
     }
 
-    /**
-     * @param string $url
-     * @return void
-     */
     private function call(string $url = '/'): void
     {
-        if (!$this->config['username'] || !$this->config['password']) {
+        if (! $this->config['username'] || ! $this->config['password']) {
             throw new \InvalidArgumentException('Signzy Username or Password is missing.');
         }
 
@@ -165,7 +160,7 @@ class Signzy extends AbstractsKycVendor implements KycVendor
             ->withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
-                'Authorization' => $this->accessToken
+                'Authorization' => $this->accessToken,
             ])
             ->post($url, $this->payload);
 
