@@ -2,18 +2,22 @@
 
 namespace Fintech\Ekyc\Vendors;
 
+use Carbon\CarbonImmutable;
 use Fintech\Core\Enums\Ekyc\KycStatus;
+use Fintech\Core\Supports\Base64File;
 use Fintech\Ekyc\Abstracts\KycVendor as AbstractsKycVendor;
 use Fintech\Ekyc\Interfaces\KycVendor;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
+use Spatie\MediaLibrary\MediaCollections\Exceptions\InvalidBase64Data;
+use Spatie\MediaLibrary\MediaCollections\Exceptions\MimeTypeNotAllowed;
 
 class Signzy extends AbstractsKycVendor implements KycVendor
 {
-    private string $accessToken;
+    private ?string $accessToken;
 
-    private string $patronId;
+    private ?string $patronId;
 
     private mixed $options;
 
@@ -28,6 +32,10 @@ class Signzy extends AbstractsKycVendor implements KycVendor
         ]);
 
         $this->options = config('fintech.ekyc.providers.signzy.options');
+
+        $this->accessToken = $this->options['access_token'];
+
+        $this->patronId = $this->options['patron_id'];
     }
 
     /**
@@ -40,99 +48,71 @@ class Signzy extends AbstractsKycVendor implements KycVendor
         ]);
     }
 
+    /**
+     * @throws InvalidBase64Data
+     * @throws MimeTypeNotAllowed
+     */
     public function verify(string $reference, array $data = []): void
     {
         $idType = \Fintech\MetaData\Facades\MetaData::idDocType()->find($data['id_doc_type_id']);
 
-        if (! $idType) {
-            throw (new ModelNotFoundException())->setModel(config('fintech.auth.id_doc_type_model', \Fintech\MetaData\Models\IdDocType::class), $data['id_doc_type_id']);
+        if (!$idType) {
+            throw (new ModelNotFoundException())->setModel(config('fintech.metadata.catalog_model', \Fintech\MetaData\Models\Catalog::class), $data['id_doc_type_id']);
         }
 
-        $idType->load('country');
+        $this->payload['task'] = 'idIntelligence';
 
-        $this->payload['country'] = strtoupper($idType->country->iso2);
-        $this->payload['reference'] = $reference;
-        $this->payload['callback_url'] = route('ekyc.kyc.status-change-callback');
-        $this->payload['email'] = $data['email'] ?? '';
+        $this->payload['essentials'] = [];
 
-        $document['supported_types'] = Arr::wrap($idType->id_doc_type_data['shuftipro_document_type'] ?? 'any');
-        $document['proof'] = $data['documents'][0]['front'] ?? '';
-        $document['additional_proof'] = $data['documents'][1]['back'] ?? '';
-        $document['backside_proof_required'] = ($idType->sides == 1) ? '0' : '1';
-        $document['allow_ekyc'] = '0';
-        $document['verification_instructions'] = [
-            'allow_paper_based' => '1',
-            'allow_photocopy' => '1',
-            'allow_laminated' => '1',
-            'allow_screenshot' => '1',
-            'allow_cropped' => '1',
-            'allow_scanned' => '1',
-        ];
-        $document['verification_mode'] = 'image_only';
-        $document['fetch_enhanced_data'] = '1';
-        $document['name'] = [
-            'full_name' => $data['name'] ?? '',
-            'fuzzy_match' => '1',
-        ];
-        $document['dob'] = $data['date_of_birth'] ?? '';
-        $document['issue_date'] = $data['id_issue_at'] ?? '';
-        $document['expiry_date'] = $data['id_expired_at'] ?? '';
-        $document['document_number'] = $data['id_no'] ?? '';
-        $document['gender'] = ($data['gender']) ? substr(strtoupper($data['gender']), 0, 1) : 'M';
-        $document['age'] = [
-            'min' => '18',
-            'max' => '65',
-        ];
+        if (isset($data['documents'][0]['front'])) {
 
-        if (! empty($data['photo'])) {
-            $face['proof'] = $data['photo'] ?? '';
-            $face['check_duplicate_request'] = '0';
-            $this->payload['face'] = $face;
+            $frontFilePath = Base64File::load($data['documents'][0]['front'],
+                ['image/jpg', 'image/jpeg', 'image/png'])
+                ->save('front', $reference);
+
+            $frontFileUrl = Storage::disk(config('filesystems.default', 'public'))->url($frontFilePath);
+
+            $this->payload['essentials']['frontUrl'] = $frontFileUrl;
+
+            $this->payload['essentials']['images'][0] = $frontFileUrl;
         }
 
-        if (! empty($data['proof_of_address'])) {
+        if (isset($data['documents'][1]['back']) && $idType->sides != 1) {
 
-            $city = \Fintech\MetaData\Facades\MetaData::city()->find($data['present_city_id']);
+            $backFilePath = Base64File::load($data['documents'][1]['back'],
+                ['image/jpg', 'image/jpeg', 'image/png'])
+                ->save('back', $reference);
 
-            $state = \Fintech\MetaData\Facades\MetaData::state()->find($data['present_state_id']);
+            $backFileUrl = Storage::disk(config('filesystems.default', 'public'))->url($backFilePath);
 
-            $country = \Fintech\MetaData\Facades\MetaData::country()->find($data['present_country_id']);
+            $this->payload['essentials']['backUrl'] = $backFileUrl;
 
-            $full_address = $data['present_address'];
-
-            if ($city) {
-                $full_address .= ", {$city->name}";
-            }
-
-            if ($state) {
-                $full_address .= ", {$state->name}";
-            }
-
-            if (! empty($data['present_post_code'])) {
-                $full_address .= ", {$data['present_post_code']}";
-            }
-
-            if ($country) {
-                $full_address .= ", {$country->name}.";
-            }
-
-            $address['proof'] = $data['proof_of_address'][''] ?? '';
-            $address['supported_types'] = ['any'];
-            $address['full_address'] = $full_address;
-            $address['address_fuzzy_match'] = '1';
-            $address['backside_proof_required'] = '0';
-            $address['verification_mode'] = 'any';
-            $this->payload['address'] = $address;
+            $this->payload['essentials']['images'][1] = $backFileUrl;
         }
 
-        $this->payload['document'] = $document;
+        $this->payload['essentials']['country'] = $data['id_issue_country'];
+        $this->payload['essentials']['idType'] = $idType->vendor_code['ekyc']['signzy'] ?? 'other';
+        $this->payload['essentials']['performImageQualityAnalysis'] = false;
+        $this->payload['essentials']['performIdClassification'] = true;
+        $this->payload['essentials']['performIdExtraction'] = true;
+        $this->payload['essentials']['performFaceExtraction'] = false;
+        $this->payload['essentials']['imageQualityThreshold'] = 0.5;
 
-        $this->call('/');
+
+        $this->call("/{$this->patronId}/documentIntelligence");
     }
 
-    private function login()
+    public function connectionCheck(): void
     {
-        $response = Http::withoutVerifying()->timeout(30)
+        if ($this->options['expired_at'] != null) {
+            $expiration = CarbonImmutable::parse($this->options['expired_at']);
+            if ($expiration->gt(CarbonImmutable::now()->addDays())) {
+                return;
+            }
+        }
+
+        $response = Http::withoutVerifying()
+            ->timeout(30)
             ->baseUrl($this->config['endpoint'])
             ->withHeaders([
                 'Content-Type' => 'application/json',
@@ -141,9 +121,17 @@ class Signzy extends AbstractsKycVendor implements KycVendor
             ->post('/login', [
                 'username' => $this->config['username'],
                 'password' => $this->config['password'],
-            ]);
+            ])->json();
 
-        dd($response->body());
+        $this->accessToken = $response['id'];
+        $this->patronId = $response['userId'];
+        $expirationDate = CarbonImmutable::now()->addSeconds($response['ttl']);
+
+        \Fintech\Core\Facades\Core::setting()->setValue('ekyc', 'providers.signzy.options', [
+            'expired_at' => $expirationDate->format('Y-m-d H:i:s'),
+            'access_token' => $this->accessToken,
+            'patron_id' => $this->patronId,
+        ], 'array');
     }
 
     private function logout()
@@ -159,37 +147,40 @@ class Signzy extends AbstractsKycVendor implements KycVendor
     }
 
     /**
+     * @param string $url
      * @return void
      */
-    private function call(string $url = '/')
+    private function call(string $url = '/'): void
     {
-        if (! $this->config['username'] || ! $this->config['password']) {
+        if (!$this->config['username'] || !$this->config['password']) {
             throw new \InvalidArgumentException('Signzy Username or Password is missing.');
         }
 
-        //pre-request token generate
-        $this->login();
+        //pre-request token verification
+        $this->connectionCheck();
 
-        $response = Http::withoutVerifying()->timeout(120)
+        $response = Http::withoutVerifying()
+            ->timeout(120)
             ->baseUrl($this->config['endpoint'])
             ->withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
-            ])->post($url, $this->payload);
+                'Authorization' => $this->accessToken
+            ])
+            ->post($url, $this->payload);
+
         $this->response = $response->json();
 
         $this->validateResponse($response);
-
-        //post-request token destroy
-        $this->logout();
     }
 
     private function validateResponse(\Illuminate\Http\Client\Response $response): void
     {
-        $this->status = KycStatus::Pending->value;
+        $this->status = ($response->status() == 200) ? KycStatus::Accepted->value : KycStatus::Pending->value;
 
         $this->note = match ($response->status()) {
-            200, 400 => $this->eventStatusHandler($response->json()),//'Bad Request: one or more parameter is invalid or missing',
+            200 => 'Document KYC Verification Completed.',
+            400 => $response->json()['error']['message'] ?? 'The given data is invalid',
             401 => 'Unauthorized: invalid signature key provided in the request',
             402 => 'Request Failed: invalid request data: missing required parameters',
             403 => 'Forbidden: service not allowed',
@@ -202,32 +193,11 @@ class Signzy extends AbstractsKycVendor implements KycVendor
         };
     }
 
-    private function eventStatusHandler(array $response): string
-    {
-        $event = $response['event'];
-
-        $this->status = match ($event) {
-            'request.deleted' => KycStatus::Cancelled->value,
-            'verification.declined' => KycStatus::Declined->value,
-            'verification.accepted' => KycStatus::Accepted->value,
-            'request.invalid' => KycStatus::Cancelled->value,
-            default => KycStatus::Pending->value,
-        };
-
-        return match ($event) {
-            'request.deleted' => 'Request has been deleted.',
-            'verification.declined' => $response['declined_reason'] ?? 'Request was valid and declined after verification.',
-            'verification.accepted' => 'Document KYC Verification Completed.',
-            'request.invalid' => $response['error']['message'] ?? 'The given data is invalid',
-            default => 'Documents are collected and request is pending for admin to review and Accept/Decline. Reference No: #'.$response['reference'],
-        };
-    }
-
     /**
      * update the current credentials
      */
     public function syncCredential(): bool
     {
-
+        return false;
     }
 }

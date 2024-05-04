@@ -99,8 +99,7 @@ return [
                 'password' => env('PACKAGE_EKYC_SIGNZY_PASSWORD', null),
             ],
             'options' => [
-                'last_requested_at' => null,
-                'timeout' => null,
+                'expired_at' => null,
                 'access_token' => null,
                 'patron_id' => null,
             ],
