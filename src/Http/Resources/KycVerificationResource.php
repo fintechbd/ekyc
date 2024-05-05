@@ -28,19 +28,20 @@ class KycVerificationResource extends JsonResource
      */
     public function with(Request $request): array
     {
-        [$dob, $document_number, $gender, $name, $issue_date, $expiry_date] = $this->getGenericFields($request->route('vendor', config('fintech.ekyc.default')));
+        [$dob, $document_number, $gender, $name, $issue_date, $expiry_date, $sponsor] = $this->getGenericFields($request->route('vendor', config('fintech.ekyc.default')));
 
         return [
             'query' => [
                 'vendor' => $request->route('vendor', config('fintech.ekyc.default')),
             ],
             'generic_fields' => [
-                'dob' => $dob ?? null,
-                'document_number' => $document_number ?? null,
+                'dob' => $dob,
+                'document_number' => $document_number,
                 'gender' => $gender,
-                'name' => $name ?? null,
-                'issue_date' => $issue_date ?? null,
-                'expiry_date' => $expiry_date ?? null,
+                'name' => $name,
+                'issue_date' => $issue_date,
+                'expiry_date' => $expiry_date,
+                'sponsor' => $sponsor,
             ],
         ];
     }
@@ -72,12 +73,14 @@ class KycVerificationResource extends JsonResource
 
         $expiry_date = $response['proof']['expiry_date'] ?? null;
 
-        return [$dob, $document_number, $gender, $name, $issue_date, $expiry_date];
+        $sponsor = null;
+
+        return [$dob, $document_number, $gender, $name, $issue_date, $expiry_date, $sponsor];
     }
 
     private function parseSignzyResponse(): array
     {
-        $response = $this->response['results']['extractedFields'] ?? [];
+        $response = $this->response['result']['results']['extractedFields'] ?? [];
 
         $dob = isset($response['DOB'])
             ? CarbonImmutable::createFromFormat('d/m/Y', $response['DOB'])->format('Y-m-d')
@@ -100,6 +103,8 @@ class KycVerificationResource extends JsonResource
             ? CarbonImmutable::createFromFormat('d/m/Y', $response['expiryDate'])->format('Y-m-d')
             : null;
 
-        return [$dob, $document_number, $gender, $name, $issue_date, $expiry_date];
+        $sponsor = $response['additionalData']['sponsor'] ?? null;
+
+        return [$dob, $document_number, $gender, $name, $issue_date, $expiry_date, $sponsor];
     }
 }
