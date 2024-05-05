@@ -86,8 +86,7 @@ class KycVerificationResource extends JsonResource
             ? CarbonImmutable::createFromFormat('d/m/Y', $response['DOB'])->format('Y-m-d')
             : null;
 
-        $document_number = $response['number'] ?? null;
-        //$document_number = $response['additionalData']['identityCardNumber'] ?? null;
+        $document_number = $response['additionalData']['identityCardNumber'] ?? null;
 
         $gender = isset($response['gender'])
             ? ($response['gender'] == 'M' ? 'male' : 'female')
