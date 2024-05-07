@@ -3,7 +3,6 @@
 namespace Fintech\Ekyc;
 
 use Fintech\Core\Traits\RegisterPackageTrait;
-use Fintech\Ekyc\Commands\EkycCommand;
 use Fintech\Ekyc\Commands\InstallCommand;
 use Illuminate\Support\ServiceProvider;
 
@@ -24,7 +23,6 @@ class EkycServiceProvider extends ServiceProvider
             __DIR__.'/../config/ekyc.php', 'fintech.ekyc'
         );
 
-        $this->app->register(\Fintech\Ekyc\Providers\RouteServiceProvider::class);
         $this->app->register(\Fintech\Ekyc\Providers\RepositoryServiceProvider::class);
     }
 
@@ -55,8 +53,7 @@ class EkycServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
-                InstallCommand::class,
-                EkycCommand::class,
+                InstallCommand::class
             ]);
         }
     }
