@@ -67,7 +67,7 @@ class KycVerificationResource extends JsonResource
             ? ($response['proof']['gender'] == 'M' ? 'male' : 'female')
             : null;
 
-        $name = ($response['proof']['first_name'] ?? '').' '.($response['proof']['last_name'] ?? '');
+        $name = ($response['proof']['first_name'] ?? '') . ' ' . ($response['proof']['last_name'] ?? '');
 
         $issue_date = $response['proof']['issue_date'] ?? null;
 
@@ -82,17 +82,22 @@ class KycVerificationResource extends JsonResource
     {
         $response = $this->response['result']['results']['extractedFields'] ?? [];
 
+        $idType = $this->response['essentials']['idType'] ?? 'Other Id Card';
+
         $dob = isset($response['DOB'])
             ? CarbonImmutable::createFromFormat('d/m/Y', $response['DOB'])->format('Y-m-d')
             : null;
 
-        $document_number = $response['additionalData']['identityCardNumber'] ?? null;
+        $document_number = match ($idType) {
+            'Residence Id Card' => ($response['additionalData']['identityCardNumber'] ?? null),
+            default => ($response['number'] ?? null)
+        };
 
         $gender = isset($response['gender'])
             ? ($response['gender'] == 'M' ? 'male' : 'female')
             : null;
 
-        $name = ($response['firstName'] ?? '').' '.($response['lastName'] ?? '');
+        $name = ($response['firstName'] ?? '') . ' ' . ($response['lastName'] ?? '');
 
         $issue_date = isset($response['additionalData']['dateOfIssue'])
             ? CarbonImmutable::createFromFormat('d/m/Y', $response['additionalData']['dateOfIssue'])->format('Y-m-d')
