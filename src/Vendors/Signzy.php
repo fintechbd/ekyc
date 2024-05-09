@@ -55,7 +55,7 @@ class Signzy extends AbstractsKycVendor implements KycVendor
 
     private function call(string $url = '/'): void
     {
-        if (!$this->config['username'] || !$this->config['password']) {
+        if (! $this->config['username'] || ! $this->config['password']) {
             throw new InvalidArgumentException('Signzy Username or Password is missing.');
         }
 
@@ -137,7 +137,7 @@ class Signzy extends AbstractsKycVendor implements KycVendor
     {
         $idType = MetaData::idDocType()->find($data['id_doc_type_id']);
 
-        if (!$idType) {
+        if (! $idType) {
             throw (new ModelNotFoundException())->setModel(config('fintech.metadata.catalog_model', Catalog::class), $data['id_doc_type_id']);
         }
 
