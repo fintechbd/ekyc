@@ -4,6 +4,7 @@ namespace Fintech\Ekyc\Repositories\Eloquent;
 
 use Fintech\Core\Repositories\EloquentRepository;
 use Fintech\Ekyc\Interfaces\KycStatusRepository as InterfacesKycStatusRepository;
+use Fintech\Ekyc\Models\KycStatus;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -14,7 +15,7 @@ class KycStatusRepository extends EloquentRepository implements InterfacesKycSta
 {
     public function __construct()
     {
-        parent::__construct(config('fintech.ekyc.kyc_status_model', \Fintech\Ekyc\Models\KycStatus::class));
+        parent::__construct(config('fintech.ekyc.kyc_status_model', KycStatus::class));
     }
 
     /**
@@ -28,7 +29,7 @@ class KycStatusRepository extends EloquentRepository implements InterfacesKycSta
         $query = $this->model->newQuery();
 
         //Searching
-        if (! empty($filters['search'])) {
+        if (!empty($filters['search'])) {
             if (is_numeric($filters['search'])) {
                 $query->where($this->model->getKeyName(), 'like', "%{$filters['search']}%");
             } else {
@@ -42,7 +43,7 @@ class KycStatusRepository extends EloquentRepository implements InterfacesKycSta
             $query->onlyTrashed();
         }
 
-        if (! empty($filters['reference_no'])) {
+        if (!empty($filters['reference_no'])) {
             $query->where('reference_no', $filters['reference_no']);
         }
 

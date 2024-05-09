@@ -2,6 +2,8 @@
 
 namespace Fintech\Ekyc\Services;
 
+use ErrorException;
+use Fintech\Core\Abstracts\BaseModel;
 use Fintech\Ekyc\Facades\Ekyc;
 use Fintech\Ekyc\Interfaces\KycStatusRepository;
 use Fintech\Ekyc\Interfaces\KycVendor;
@@ -23,24 +25,10 @@ class KycStatusService
     }
 
     /**
-     * @return mixed
-     */
-    public function list(array $filters = [])
-    {
-        return $this->kycStatusRepository->list($filters);
-
-    }
-
-    public function create(array $inputs = [])
-    {
-        return $this->kycStatusRepository->create($inputs);
-    }
-
-    /**
-     * @return \Fintech\Core\Abstracts\BaseModel
+     * @return BaseModel
      *
      * @throws BindingResolutionException
-     * @throws \ErrorException
+     * @throws ErrorException
      */
     public function verify(string $vendor, array $inputs = [])
     {
@@ -63,17 +51,22 @@ class KycStatusService
 
     /**
      * @throws BindingResolutionException
-     * @throws \ErrorException
+     * @throws ErrorException
      */
     private function initVendor(string $vendor): KycVendor|\Fintech\Ekyc\Abstracts\KycVendor
     {
         $driver = config("fintech.ekyc.providers.{$vendor}.driver");
 
-        if (! $driver) {
-            throw new \ErrorException("Missing driver for `{$vendor}` kyc provider.");
+        if (!$driver) {
+            throw new ErrorException("Missing driver for `{$vendor}` kyc provider.");
         }
 
         return app()->make($driver);
+    }
+
+    public function create(array $inputs = [])
+    {
+        return $this->kycStatusRepository->create($inputs);
     }
 
     public function find($id, $onlyTrashed = false)
@@ -99,6 +92,15 @@ class KycStatusService
     public function export(array $filters)
     {
         return $this->kycStatusRepository->list($filters);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function list(array $filters = [])
+    {
+        return $this->kycStatusRepository->list($filters);
+
     }
 
     public function import(array $filters)

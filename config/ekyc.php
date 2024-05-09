@@ -1,6 +1,9 @@
 <?php
 
 // config for Fintech/Ekyc
+use Fintech\Ekyc\Models\KycStatus;
+use Fintech\Ekyc\Repositories\Eloquent\KycStatusRepository;
+
 return [
 
     /*
@@ -125,7 +128,7 @@ return [
     |
     | This value will be used to across system where model is needed
     */
-    'kyc_status_model' => \Fintech\Ekyc\Models\KycStatus::class,
+    'kyc_status_model' => KycStatus::class,
 
     //** Model Config Point Do not Remove **//
 
@@ -138,7 +141,7 @@ return [
     */
 
     'repositories' => [
-        \Fintech\Ekyc\Interfaces\KycStatusRepository::class => \Fintech\Ekyc\Repositories\Eloquent\KycStatusRepository::class,
+        \Fintech\Ekyc\Interfaces\KycStatusRepository::class => KycStatusRepository::class,
 
         //** Repository Binding Config Point Do not Remove **//
     ],

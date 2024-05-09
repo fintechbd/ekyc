@@ -2,10 +2,11 @@
 
 namespace Fintech\Ekyc\Facades;
 
+use Fintech\Ekyc\Services\KycStatusService;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static \Fintech\Ekyc\Services\KycStatusService kycStatus()
+ * @method static KycStatusService kycStatus()
  * @method static string getReferenceToken()
  *                                           // Crud Service Method Point Do not Remove //
  *

@@ -22,17 +22,6 @@ class AdminVerify extends AbstractsKycVendor implements KycVendor
 
     }
 
-    private function call($data = [])
-    {
-        $response = Http::withoutVerifying()
-            ->withBasicAuth($this->config['username'], $this->config['password'])
-            ->withHeaders([
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-            ])
-            ->post($this->config['endpoint'], $data);
-    }
-
     public function status(array $reference = [])
     {
 
@@ -54,5 +43,16 @@ class AdminVerify extends AbstractsKycVendor implements KycVendor
     public function syncCredential(): bool
     {
         // TODO: Implement syncCredential() method.
+    }
+
+    private function call($data = [])
+    {
+        $response = Http::withoutVerifying()
+            ->withBasicAuth($this->config['username'], $this->config['password'])
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])
+            ->post($this->config['endpoint'], $data);
     }
 }
