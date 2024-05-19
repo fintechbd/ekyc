@@ -44,7 +44,7 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
      */
     private function call(string $url = '/')
     {
-        if (! $this->config['client_id'] || ! $this->config['secret_key']) {
+        if (!$this->config['client_id'] || !$this->config['secret_key']) {
             throw new InvalidArgumentException('Shufti Pro Client ID & Secret Key is missing.');
         }
 
@@ -96,7 +96,7 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
             'verification.declined' => $response['declined_reason'] ?? 'Request was valid and declined after verification.',
             'verification.accepted' => 'Document KYC Verification Completed.',
             'request.invalid' => $response['error']['message'] ?? 'The given data is invalid',
-            default => 'Documents are collected and request is pending for admin to review and Accept/Decline. Reference No: #'.$response['reference'],
+            default => 'Documents are collected and request is pending for admin to review and Accept/Decline. Reference No: #' . $response['reference'],
         };
     }
 
@@ -104,13 +104,13 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
     {
         $idType = MetaData::idDocType()->find($data['id_doc_type_id']);
 
-        if (! $idType) {
+        if (!$idType) {
             throw (new ModelNotFoundException())->setModel(config('fintech.metadata.catalog_model', Catalog::class), $data['id_doc_type_id']);
         }
 
         $country = $idType->countries->firstWhere('name', $data['id_issue_country']);
 
-        if (! $country) {
+        if (!$country) {
             throw (new ModelNotFoundException())->setModel(config('fintech.metadata.country_model', Country::class), $data['id_issue_country']);
         }
 
@@ -120,7 +120,7 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
         $this->payload['email'] = $data['email'] ?? '';
         $document['supported_types'] = Arr::wrap($idType->vendor_code['ekyc']['shufti_pro'] ?? 'any');
         $document['proof'] = $data['documents'][0]['front'] ?? '';
-        if (! empty($data['documents'][1]['back'])) {
+        if (!empty($data['documents'][1]['back'])) {
             $document['additional_proof'] = $data['documents'][1]['back'];
         }
         $document['backside_proof_required'] = ($idType->sides == 1) ? '0' : '1';
@@ -135,10 +135,10 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
         ];
         $document['verification_mode'] = 'image_only';
         $document['fetch_enhanced_data'] = '1';
-        //        $document['name'] = [
-        //            'full_name' => $data['name'] ?? '',
-        //            'fuzzy_match' => '1',
-        //        ];
+//        $document['name'] = [
+//            'full_name' => $data['name'] ?? '',
+//            'fuzzy_match' => '1',
+//        ];
         //        $document['dob'] = $data['date_of_birth'] ?? '';
         //        $document['issue_date'] = $data['id_issue_at'] ?? '';
         //        $document['expiry_date'] = $data['id_expired_at'] ?? '';
@@ -149,11 +149,11 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
         //            'max' => '65',
         //        ];
 
-        //        if (! empty($data['photo'])) {
-        //            $face['proof'] = $data['photo'] ?? '';
-        //            $face['check_duplicate_request'] = '0';
-        //            $this->payload['face'] = $face;
-        //        }
+        if (!empty($data['photo'])) {
+            $face['proof'] = $data['photo'] ?? '';
+            $face['check_duplicate_request'] = '0';
+            $this->payload['face'] = $face;
+        }
         //
         //        if (! empty($data['proof_of_address'])) {
         //
