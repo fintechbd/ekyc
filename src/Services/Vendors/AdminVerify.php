@@ -1,6 +1,6 @@
 <?php
 
-namespace Fintech\Ekyc\Vendors;
+namespace Fintech\Ekyc\Services\Vendors;
 
 use Fintech\Ekyc\Abstracts\KycVendor as AbstractsKycVendor;
 use Fintech\Ekyc\Interfaces\KycVendor;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Fintech\Ekyc\Vendors;
+namespace Fintech\Ekyc\Services\Vendors;
 
 use Fintech\Core\Enums\Ekyc\KycStatus;
 use Fintech\Ekyc\Abstracts\KycVendor as AbstractsKycVendor;
