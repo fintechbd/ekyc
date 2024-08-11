@@ -20,9 +20,7 @@ class KycStatusService
     /**
      * KycStatusService constructor.
      */
-    public function __construct(private readonly KycStatusRepository $kycStatusRepository)
-    {
-    }
+    public function __construct(private readonly KycStatusRepository $kycStatusRepository) {}
 
     /**
      * @return BaseModel

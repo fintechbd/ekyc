@@ -105,13 +105,13 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
         $idType = MetaData::idDocType()->find($data['id_doc_type_id']);
 
         if (! $idType) {
-            throw (new ModelNotFoundException())->setModel(config('fintech.metadata.catalog_model', Catalog::class), $data['id_doc_type_id']);
+            throw (new ModelNotFoundException)->setModel(config('fintech.metadata.catalog_model', Catalog::class), $data['id_doc_type_id']);
         }
 
         $country = $idType->countries->firstWhere('name', $data['id_issue_country']);
 
         if (! $country) {
-            throw (new ModelNotFoundException())->setModel(config('fintech.metadata.country_model', Country::class), $data['id_issue_country']);
+            throw (new ModelNotFoundException)->setModel(config('fintech.metadata.country_model', Country::class), $data['id_issue_country']);
         }
 
         $this->payload['country'] = strtoupper($country->iso2);

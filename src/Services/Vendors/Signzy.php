@@ -138,7 +138,7 @@ class Signzy extends AbstractsKycVendor implements KycVendor
         $idType = MetaData::idDocType()->find($data['id_doc_type_id']);
 
         if (! $idType) {
-            throw (new ModelNotFoundException())->setModel(config('fintech.metadata.catalog_model', Catalog::class), $data['id_doc_type_id']);
+            throw (new ModelNotFoundException)->setModel(config('fintech.metadata.catalog_model', Catalog::class), $data['id_doc_type_id']);
         }
 
         $this->payload['task'] = 'idIntelligence';

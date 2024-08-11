@@ -21,8 +21,6 @@ class KycStatus extends BaseModel
 
     protected $guarded = ['id'];
 
-
-
     protected $casts = ['kyc_status_data' => 'array', 'restored_at' => 'datetime', 'enabled' => 'bool', 'request' => 'array', 'response' => 'array'];
 
     protected $hidden = ['creator_id', 'editor_id', 'destroyer_id', 'restorer_id'];
