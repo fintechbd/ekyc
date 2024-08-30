@@ -15,9 +15,12 @@ class Ekyc
         return app(KycStatusService::class);
     }
 
+    /**
+     * @throws \Exception
+     */
     public function getReferenceToken(): string
     {
-        $serial = (int) config('fintech.ekyc.reference_count');
+        $serial = Core::setting()->getValue('ekyc', 'reference_count', 1);
 
         $prefix = strtoupper(config('fintech.ekyc.reference_prefix', 'KYC'));
 
