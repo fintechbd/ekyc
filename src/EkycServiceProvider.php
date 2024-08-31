@@ -21,7 +21,7 @@ class EkycServiceProvider extends ServiceProvider
         $this->packageCode = 'ekyc';
 
         $this->mergeConfigFrom(
-            __DIR__.'/../config/ekyc.php', 'fintech.ekyc'
+            __DIR__ . '/../config/ekyc.php', 'fintech.ekyc'
         );
 
         $this->app->register(RepositoryServiceProvider::class);
@@ -35,21 +35,21 @@ class EkycServiceProvider extends ServiceProvider
         $this->injectOnConfig();
 
         $this->publishes([
-            __DIR__.'/../config/ekyc.php' => config_path('fintech/ekyc.php'),
+            __DIR__ . '/../config/ekyc.php' => config_path('fintech/ekyc.php'),
         ]);
 
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
 
-        $this->loadTranslationsFrom(__DIR__.'/../lang', 'ekyc');
+        $this->loadTranslationsFrom(__DIR__ . '/../lang', 'ekyc');
 
         $this->publishes([
-            __DIR__.'/../lang' => $this->app->langPath('vendor/ekyc'),
+            __DIR__ . '/../lang' => $this->app->langPath('vendor/ekyc'),
         ]);
 
-        $this->loadViewsFrom(__DIR__.'/../resources/views', 'ekyc');
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'ekyc');
 
         $this->publishes([
-            __DIR__.'/../resources/views' => resource_path('views/vendor/ekyc'),
+            __DIR__ . '/../resources/views' => resource_path('views/vendor/ekyc'),
         ]);
 
         if ($this->app->runningInConsole()) {
