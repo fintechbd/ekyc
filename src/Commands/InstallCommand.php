@@ -20,8 +20,8 @@ class InstallCommand extends Command
             'description' => 'The last token count value is assigned and the next will be increment by 1.',
             'key' => 'reference_count',
             'type' => 'integer',
-            'value' => '1'
-        ]
+            'value' => '1',
+        ],
     ];
 
     public function handle(): int
