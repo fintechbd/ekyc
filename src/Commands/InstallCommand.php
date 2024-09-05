@@ -2,6 +2,7 @@
 
 namespace Fintech\Ekyc\Commands;
 
+use Exception;
 use Fintech\Core\Traits\HasCoreSettingTrait;
 use Illuminate\Console\Command;
 
@@ -32,7 +33,7 @@ class InstallCommand extends Command
 
             return self::SUCCESS;
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
 
             $this->components->twoColumnDetail($e->getMessage(), '<fg=red;options=bold>ERROR</>');
 

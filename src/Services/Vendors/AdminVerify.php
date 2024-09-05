@@ -22,11 +22,17 @@ class AdminVerify extends AbstractsKycVendor implements KycVendor
 
     }
 
-    public function status(array $reference = []) {}
+    public function status(array $reference = [])
+    {
+    }
 
-    public function verify(string $reference, array $data = []): void {}
+    public function verify(string $reference, array $data = []): void
+    {
+    }
 
-    public function delete(array $reference = []) {}
+    public function delete(array $reference = [])
+    {
+    }
 
     /**
      * update the current credentials
