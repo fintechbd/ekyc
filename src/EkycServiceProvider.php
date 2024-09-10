@@ -48,6 +48,8 @@ class EkycServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'ekyc');
 
+        $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
+
         $this->publishes([
             __DIR__.'/../resources/views' => resource_path('views/vendor/ekyc'),
         ]);
