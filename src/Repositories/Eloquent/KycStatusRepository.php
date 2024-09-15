@@ -29,7 +29,7 @@ class KycStatusRepository extends EloquentRepository implements InterfacesKycSta
         $query = $this->model->newQuery();
 
         //Searching
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             if (is_numeric($filters['search'])) {
                 $query->where($this->model->getKeyName(), 'like', "%{$filters['search']}%");
             } else {
@@ -38,12 +38,12 @@ class KycStatusRepository extends EloquentRepository implements InterfacesKycSta
             }
         }
 
-        if (!empty($filters['id_not_in'])) {
-            $query->whereNotIn($this->model->getKeyName(), (array)$filters['id_not_in']);
+        if (! empty($filters['id_not_in'])) {
+            $query->whereNotIn($this->model->getKeyName(), (array) $filters['id_not_in']);
         }
 
-        if (!empty($filters['id_in'])) {
-            $query->whereIn($this->model->getKeyName(), (array)$filters['id_in']);
+        if (! empty($filters['id_in'])) {
+            $query->whereIn($this->model->getKeyName(), (array) $filters['id_in']);
         }
 
         //Display Trashed
@@ -51,7 +51,7 @@ class KycStatusRepository extends EloquentRepository implements InterfacesKycSta
             $query->onlyTrashed();
         }
 
-        if (!empty($filters['reference_no'])) {
+        if (! empty($filters['reference_no'])) {
             $query->where('reference_no', $filters['reference_no']);
         }
 
