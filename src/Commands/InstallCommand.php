@@ -27,6 +27,8 @@ class InstallCommand extends Command
 
     public function handle(): int
     {
+        $this->infoMessage("Module Installation", 'RUNNING');
+
         try {
 
             $this->addOverwriteSetting();
