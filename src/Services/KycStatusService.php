@@ -20,7 +20,9 @@ class KycStatusService
     /**
      * KycStatusService constructor.
      */
-    public function __construct(private readonly KycStatusRepository $kycStatusRepository) {}
+    public function __construct(private readonly KycStatusRepository $kycStatusRepository)
+    {
+    }
 
     /**
      * @return BaseModel
@@ -55,7 +57,7 @@ class KycStatusService
     {
         $driver = config("fintech.ekyc.providers.{$vendor}.driver");
 
-        if (! $driver) {
+        if (!$driver) {
             throw new ErrorException("Missing driver for `{$vendor}` kyc provider.");
         }
 
