@@ -8,9 +8,6 @@ use Fintech\Ekyc\Services\KycStatusService;
 
 class Ekyc
 {
-    /**
-     * @return KycStatusService
-     */
     public function kycStatus($filters = null)
     {
         return \singleton(KycStatusService::class, $filters);
