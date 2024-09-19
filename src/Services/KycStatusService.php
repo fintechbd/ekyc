@@ -4,6 +4,7 @@ namespace Fintech\Ekyc\Services;
 
 use ErrorException;
 use Fintech\Core\Abstracts\BaseModel;
+use Fintech\Core\Exceptions\VendorNotFoundException;
 use Fintech\Ekyc\Facades\Ekyc;
 use Fintech\Ekyc\Interfaces\KycStatusRepository;
 use Fintech\Ekyc\Interfaces\KycVendor;
@@ -51,14 +52,14 @@ class KycStatusService
 
     /**
      * @throws BindingResolutionException
-     * @throws ErrorException
+     * @throws VendorNotFoundException
      */
     private function initVendor(string $vendor): KycVendor|\Fintech\Ekyc\Abstracts\KycVendor
     {
         $driver = config("fintech.ekyc.providers.{$vendor}.driver");
 
         if (! $driver) {
-            throw new ErrorException("Missing driver for `{$vendor}` kyc provider.");
+            throw new VendorNotFoundException(ucfirst($vendor));
         }
 
         return app()->make($driver);
