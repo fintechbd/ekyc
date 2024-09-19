@@ -11,9 +11,9 @@ class Ekyc
     /**
      * @return KycStatusService
      */
-    public function kycStatus()
-    {
-        return app(KycStatusService::class);
+    public function kycStatus($filters = null)
+{
+	return \singleton(KycStatusService::class, $filters);
     }
 
     /**
