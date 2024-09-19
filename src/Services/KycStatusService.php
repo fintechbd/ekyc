@@ -15,8 +15,10 @@ use Illuminate\Support\Arr;
  *
  * @property-read KycStatusRepository $kycStatusRepository
  */
-class KycStatusService extends \Fintech\Core\Abstracts\Service
+class KycStatusService
 {
+    use \Fintech\Core\Traits\HasFindWhereSearch;
+
     /**
      * KycStatusService constructor.
      */
