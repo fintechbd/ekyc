@@ -15,7 +15,7 @@ use Illuminate\Support\Arr;
  *
  * @property-read KycStatusRepository $kycStatusRepository
  */
-class KycStatusService
+class KycStatusService extends \Fintech\Core\Abstracts\Service
 {
     /**
      * KycStatusService constructor.

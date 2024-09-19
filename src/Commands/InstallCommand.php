@@ -3,12 +3,12 @@
 namespace Fintech\Ekyc\Commands;
 
 use Exception;
-use Fintech\Core\Traits\HasCoreSettingTrait;
+use Fintech\Core\Traits\HasCoreSetting;
 use Illuminate\Console\Command;
 
 class InstallCommand extends Command
 {
-    use HasCoreSettingTrait;
+    use HasCoreSetting;
 
     public $signature = 'ekyc:install';
 
