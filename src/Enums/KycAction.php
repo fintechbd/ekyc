@@ -4,7 +4,7 @@ namespace Fintech\Ekyc\Enums;
 
 use Fintech\Core\Traits\EnumHasSerialization;
 
-enum KycAction: string
+enum KycAction: string implements \JsonSerializable
 {
     use EnumHasSerialization;
 
