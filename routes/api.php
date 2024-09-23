@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 if (Config::get('fintech.ekyc.enabled')) {
-    Route::prefix(config('fintech.ekyc.root_prefix', 'api/'))->middleware(['api', 'http_log', 'encrypted'])->group(function () {
+    Route::prefix(config('fintech.ekyc.root_prefix', 'api/'))->middleware(['api'])->group(function () {
         Route::prefix('ekyc')->name('ekyc.')
             ->middleware(config('fintech.auth.middleware'))
             ->group(function () {
