@@ -1,8 +1,8 @@
 <?php
 
-use Fintech\RestApi\Http\Controllers\Ekyc\KycHandlerController;
-use Fintech\RestApi\Http\Controllers\Ekyc\KycStatusController;
-use Fintech\RestApi\Http\Controllers\Ekyc\VendorSyncController;
+use Fintech\Ekyc\Http\Controllers\KycHandlerController;
+use Fintech\Ekyc\Http\Controllers\KycStatusController;
+use Fintech\Ekyc\Http\Controllers\VendorSyncController;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 
