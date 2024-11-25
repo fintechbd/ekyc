@@ -2,7 +2,7 @@
 
 namespace Fintech\Ekyc;
 
-use Fintech\Core\Traits\RegisterPackageTrait;
+use Fintech\Core\Traits\Packages\RegisterPackageTrait;
 use Fintech\Ekyc\Commands\InstallCommand;
 use Fintech\Ekyc\Providers\RepositoryServiceProvider;
 use Illuminate\Support\ServiceProvider;
