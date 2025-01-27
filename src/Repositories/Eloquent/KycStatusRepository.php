@@ -28,7 +28,7 @@ class KycStatusRepository extends EloquentRepository implements InterfacesKycSta
     {
         $query = $this->model->newQuery();
 
-        //Searching
+        // Searching
         if (! empty($filters['search'])) {
             if (is_numeric($filters['search'])) {
                 $query->where($this->model->getKeyName(), 'like', "%{$filters['search']}%");
@@ -46,7 +46,7 @@ class KycStatusRepository extends EloquentRepository implements InterfacesKycSta
             $query->whereIn($this->model->getKeyName(), (array) $filters['id_in']);
         }
 
-        //Display Trashed
+        // Display Trashed
         if (isset($filters['trashed']) && $filters['trashed'] === true) {
             $query->onlyTrashed();
         }
@@ -55,10 +55,10 @@ class KycStatusRepository extends EloquentRepository implements InterfacesKycSta
             $query->where('reference_no', $filters['reference_no']);
         }
 
-        //Handle Sorting
+        // Handle Sorting
         $query->orderBy($filters['sort'] ?? $this->model->getKeyName(), $filters['dir'] ?? 'asc');
 
-        //Execute Output
+        // Execute Output
         return $this->executeQuery($query, $filters);
 
     }

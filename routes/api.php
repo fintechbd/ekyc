@@ -30,7 +30,7 @@ if (Config::get('fintech.ekyc.enabled')) {
                     Route::get('vendors', [KycHandlerController::class, 'vendor'])->name('kyc.vendors');
                     Route::get('reference-token', [KycHandlerController::class, 'token'])->name('kyc.vendors');
                 });
-                //DO NOT REMOVE THIS LINE//
+                // DO NOT REMOVE THIS LINE//
             });
     });
     Route::any('api/ekyc/shufti-pro-verification-callback',

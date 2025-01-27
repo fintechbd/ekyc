@@ -59,7 +59,7 @@ class Signzy extends AbstractsKycVendor implements KycVendor
             throw new InvalidArgumentException('Signzy Username or Password is missing.');
         }
 
-        //pre-request token verification
+        // pre-request token verification
         $this->connectionCheck();
 
         $response = Http::withoutVerifying()

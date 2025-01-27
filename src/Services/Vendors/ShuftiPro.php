@@ -66,7 +66,7 @@ class ShuftiPro extends AbstractsKycVendor implements KycVendor
         $this->status = KycStatus::Pending->value;
 
         $this->note = match ($response->status()) {
-            200, 400 => $this->eventStatusHandler($response->json()),//'Bad Request: one or more parameter is invalid or missing',
+            200, 400 => $this->eventStatusHandler($response->json()),// 'Bad Request: one or more parameter is invalid or missing',
             401 => 'Unauthorized: invalid signature key provided in the request',
             402 => 'Request Failed: invalid request data: missing required parameters',
             403 => 'Forbidden: service not allowed',
