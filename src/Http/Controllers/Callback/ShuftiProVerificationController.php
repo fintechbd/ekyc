@@ -2,8 +2,8 @@
 
 namespace Fintech\Ekyc\Http\Controllers\Callback;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 
 class ShuftiProVerificationController extends Controller
 {
