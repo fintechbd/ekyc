@@ -28,7 +28,7 @@ if (Config::get('fintech.ekyc.enabled')) {
                     Route::post('verification/{vendor?}', [KycHandlerController::class, 'verification'])->name('kyc.verification');
                     Route::get('credentials/{vendor?}', [KycHandlerController::class, 'credential'])->name('kyc.credential');
                     Route::get('vendors', [KycHandlerController::class, 'vendor'])->name('kyc.vendors');
-                    Route::get('reference-token', [KycHandlerController::class, 'token'])->name('kyc.vendors');
+                    Route::get('reference-token', [KycHandlerController::class, 'token'])->name('kyc.reference-token');
                 });
                 // DO NOT REMOVE THIS LINE//
             });
