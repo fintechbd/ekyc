@@ -12,7 +12,7 @@ return [
     |--------------------------------------------------------------------------
     | This setting enable the API will be available or not
     */
-    'enabled' => env('PACKAGE_EKYC_ENABLED', true),
+    'enabled' => env('EKYC_ENABLED', true),
 
     /*
     |--------------------------------------------------------------------------
@@ -20,7 +20,7 @@ return [
     |--------------------------------------------------------------------------
     | When KYC is initialed which vendor will be used to proceed.
     */
-    'default' => env('PACKAGE_EKYC_DRIVER', 'manual'),
+    'default' => env('EKYC_DRIVER', 'manual'),
 
     /*
     |--------------------------------------------------------------------------
@@ -62,7 +62,7 @@ return [
             'options' => [],
         ],
         'shufti_pro' => [
-            'mode' => env('PACKAGE_EKYC_SHUFTIPRO_MODE', 'sandbox'),
+            'mode' => env('EKYC_SHUFTIPRO_MODE', 'sandbox'),
             'driver' => Fintech\Ekyc\Services\Vendors\ShuftiPro::class,
             'countries' => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
                 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
@@ -86,13 +86,13 @@ return [
                 250],
             'live' => [
                 'endpoint' => 'https://api.shuftipro.com',
-                'client_id' => env('PACKAGE_EKYC_SHUFTIPRO_ID', null),
-                'secret_key' => env('PACKAGE_EKYC_SHUFTIPRO_SECRET', null),
+                'client_id' => env('EKYC_SHUFTIPRO_ID', null),
+                'secret_key' => env('EKYC_SHUFTIPRO_SECRET', null),
             ],
             'sandbox' => [
                 'endpoint' => 'https://api.shuftipro.com',
-                'client_id' => env('PACKAGE_EKYC_SHUFTIPRO_ID', null),
-                'secret_key' => env('PACKAGE_EKYC_SHUFTIPRO_SECRET', null),
+                'client_id' => env('EKYC_SHUFTIPRO_ID', null),
+                'secret_key' => env('EKYC_SHUFTIPRO_SECRET', null),
             ],
             'options' => [
                 'language' => strtoupper(config('app.locale', '')),
@@ -107,18 +107,18 @@ return [
             ],
         ],
         'signzy' => [
-            'mode' => env('PACKAGE_EKYC_SIGNZY_MODE', 'sandbox'),
+            'mode' => env('EKYC_SIGNZY_MODE', 'sandbox'),
             'driver' => Fintech\Ekyc\Services\Vendors\Signzy::class,
             'countries' => [231],
             'live' => [
                 'endpoint' => 'https://signzy.tech/api/v2/patrons',
-                'username' => env('PACKAGE_EKYC_SIGNZY_USERNAME', null),
-                'password' => env('PACKAGE_EKYC_SIGNZY_PASSWORD', null),
+                'username' => env('EKYC_SIGNZY_USERNAME', null),
+                'password' => env('EKYC_SIGNZY_PASSWORD', null),
             ],
             'sandbox' => [
                 'endpoint' => 'https://preproduction.signzy.tech/api/v2/patrons',
-                'username' => env('PACKAGE_EKYC_SIGNZY_USERNAME', null),
-                'password' => env('PACKAGE_EKYC_SIGNZY_PASSWORD', null),
+                'username' => env('EKYC_SIGNZY_USERNAME', null),
+                'password' => env('EKYC_SIGNZY_PASSWORD', null),
             ],
             'options' => [
                 'expired_at' => null,
