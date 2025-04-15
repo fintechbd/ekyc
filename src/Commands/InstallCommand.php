@@ -37,7 +37,7 @@ class InstallCommand extends Command
 
         } catch (Exception $e) {
 
-            $this->components->twoColumnDetail($e->getMessage(), '<fg=red;options=bold>ERROR</>');
+            $this->errorMessage($e->getMessage());
 
             return self::FAILURE;
         }
