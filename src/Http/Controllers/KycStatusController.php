@@ -128,7 +128,7 @@ class KycStatusController extends Controller
 
             $inputs = $request->validated();
 
-            if (!ekyc()->kycStatus()->update($id, $inputs)) {
+            if (! ekyc()->kycStatus()->update($id, $inputs)) {
 
                 throw (new UpdateOperationException)->setModel(config('fintech.ekyc.kyc_status_model'), $id);
             }
@@ -162,7 +162,7 @@ class KycStatusController extends Controller
                 throw (new ModelNotFoundException)->setModel(config('fintech.ekyc.kyc_status_model'), $id);
             }
 
-            if (!ekyc()->kycStatus()->destroy($id)) {
+            if (! ekyc()->kycStatus()->destroy($id)) {
 
                 throw (new DeleteOperationException)->setModel(config('fintech.ekyc.kyc_status_model'), $id);
             }
@@ -194,7 +194,7 @@ class KycStatusController extends Controller
                 throw (new ModelNotFoundException)->setModel(config('fintech.ekyc.kyc_status_model'), $id);
             }
 
-            if (!ekyc()->kycStatus()->restore($id)) {
+            if (! ekyc()->kycStatus()->restore($id)) {
 
                 throw (new RestoreOperationException)->setModel(config('fintech.ekyc.kyc_status_model'), $id);
             }
