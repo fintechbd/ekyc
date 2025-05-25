@@ -3,7 +3,6 @@
 namespace Fintech\Ekyc\Http\Controllers;
 
 use Exception;
-use Fintech\Ekyc\Facades\Ekyc;
 use Fintech\Ekyc\Http\Requests\KycVerificationRequest;
 use Fintech\Ekyc\Http\Resources\KycVerificationResource;
 use Illuminate\Http\JsonResponse;
@@ -24,7 +23,7 @@ class KycHandlerController extends Controller
 
             $inputs = $request->validated();
 
-            $kycStatus = Ekyc::kycStatus()->verify($vendor, $inputs);
+            $kycStatus = ekyc()->kycStatus()->verify($vendor, $inputs);
 
             return new KycVerificationResource($kycStatus);
 
@@ -100,6 +99,6 @@ class KycHandlerController extends Controller
      */
     public function token(): JsonResponse
     {
-        return response()->success(['data' => ['reference_no' => Ekyc::getReferenceToken()]]);
+        return response()->success(['data' => ['reference_no' => ekyc()->getReferenceToken()]]);
     }
 }

@@ -7,7 +7,6 @@ use Fintech\Core\Exceptions\DeleteOperationException;
 use Fintech\Core\Exceptions\RestoreOperationException;
 use Fintech\Core\Exceptions\StoreOperationException;
 use Fintech\Core\Exceptions\UpdateOperationException;
-use Fintech\Ekyc\Facades\Ekyc;
 use Fintech\Ekyc\Http\Requests\ImportKycStatusRequest;
 use Fintech\Ekyc\Http\Requests\IndexKycStatusRequest;
 use Fintech\Ekyc\Http\Requests\StoreKycStatusRequest;
@@ -42,7 +41,7 @@ class KycStatusController extends Controller
         try {
             $inputs = $request->validated();
 
-            $kycStatusPaginate = Ekyc::kycStatus()->list($inputs);
+            $kycStatusPaginate = ekyc()->kycStatus()->list($inputs);
 
             return new KycStatusCollection($kycStatusPaginate);
 
@@ -65,7 +64,7 @@ class KycStatusController extends Controller
         try {
             $inputs = $request->validated();
 
-            $kycStatus = Ekyc::kycStatus()->create($inputs);
+            $kycStatus = ekyc()->kycStatus()->create($inputs);
 
             if (! $kycStatus) {
                 throw (new StoreOperationException)->setModel(config('fintech.ekyc.kyc_status_model'));
@@ -94,7 +93,7 @@ class KycStatusController extends Controller
     {
         try {
 
-            $kycStatus = Ekyc::kycStatus()->find($id);
+            $kycStatus = ekyc()->kycStatus()->find($id);
 
             if (! $kycStatus) {
                 throw (new ModelNotFoundException)->setModel(config('fintech.ekyc.kyc_status_model'), $id);
@@ -121,7 +120,7 @@ class KycStatusController extends Controller
     {
         try {
 
-            $kycStatus = Ekyc::kycStatus()->find($id);
+            $kycStatus = ekyc()->kycStatus()->find($id);
 
             if (! $kycStatus) {
                 throw (new ModelNotFoundException)->setModel(config('fintech.ekyc.kyc_status_model'), $id);
@@ -129,7 +128,7 @@ class KycStatusController extends Controller
 
             $inputs = $request->validated();
 
-            if (! Ekyc::kycStatus()->update($id, $inputs)) {
+            if (!ekyc()->kycStatus()->update($id, $inputs)) {
 
                 throw (new UpdateOperationException)->setModel(config('fintech.ekyc.kyc_status_model'), $id);
             }
@@ -157,13 +156,13 @@ class KycStatusController extends Controller
     {
         try {
 
-            $kycStatus = Ekyc::kycStatus()->find($id);
+            $kycStatus = ekyc()->kycStatus()->find($id);
 
             if (! $kycStatus) {
                 throw (new ModelNotFoundException)->setModel(config('fintech.ekyc.kyc_status_model'), $id);
             }
 
-            if (! Ekyc::kycStatus()->destroy($id)) {
+            if (!ekyc()->kycStatus()->destroy($id)) {
 
                 throw (new DeleteOperationException)->setModel(config('fintech.ekyc.kyc_status_model'), $id);
             }
@@ -189,13 +188,13 @@ class KycStatusController extends Controller
     {
         try {
 
-            $kycStatus = Ekyc::kycStatus()->find($id, true);
+            $kycStatus = ekyc()->kycStatus()->find($id, true);
 
             if (! $kycStatus) {
                 throw (new ModelNotFoundException)->setModel(config('fintech.ekyc.kyc_status_model'), $id);
             }
 
-            if (! Ekyc::kycStatus()->restore($id)) {
+            if (!ekyc()->kycStatus()->restore($id)) {
 
                 throw (new RestoreOperationException)->setModel(config('fintech.ekyc.kyc_status_model'), $id);
             }
@@ -220,7 +219,7 @@ class KycStatusController extends Controller
         try {
             $inputs = $request->validated();
 
-            $kycStatusPaginate = Ekyc::kycStatus()->export($inputs);
+            $kycStatusPaginate = ekyc()->kycStatus()->export($inputs);
 
             return response()->exported(__('core::messages.resource.exported', ['model' => 'Kyc Status']));
 
@@ -244,7 +243,7 @@ class KycStatusController extends Controller
         try {
             $inputs = $request->validated();
 
-            $kycStatusPaginate = Ekyc::kycStatus()->list($inputs);
+            $kycStatusPaginate = ekyc()->kycStatus()->list($inputs);
 
             return new KycStatusCollection($kycStatusPaginate);
 

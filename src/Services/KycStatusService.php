@@ -5,7 +5,6 @@ namespace Fintech\Ekyc\Services;
 use ErrorException;
 use Fintech\Core\Abstracts\BaseModel;
 use Fintech\Core\Exceptions\VendorNotFoundException;
-use Fintech\Ekyc\Facades\Ekyc;
 use Fintech\Ekyc\Interfaces\KycStatusRepository;
 use Fintech\Ekyc\Interfaces\KycVendor;
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -33,7 +32,7 @@ class KycStatusService
      */
     public function verify(string $vendor, array $inputs = [])
     {
-        $data['reference_no'] = Ekyc::getReferenceToken();
+        $data['reference_no'] = ekyc()->getReferenceToken();
         $data['type'] = 'document';
         $data['attempts'] = 1;
         $data['vendor'] = $vendor;
